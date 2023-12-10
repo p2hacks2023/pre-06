@@ -20,7 +20,7 @@ function App() {
         width={540}
         height={360}
         ref={webcamRef}
-        screenshotFormat="image/jpeg"
+        screenshotFormat="image/png"
         videoConstraints={videoConstraints}
       />
       <video id="canvas"></video>
