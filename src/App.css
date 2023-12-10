@@ -1,6 +1,13 @@
 #box {
   background: #00c788;
-  width: 1000px;
-  height: 1000px;
+  width: 500px;
+  height: 500px;
+  margin: 10px;
+}
+
+#filler {
+  background: #d8d8d8;
+  width: 500px;
+  height: 500px;
   margin: 10px;
 }
