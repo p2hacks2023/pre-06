@@ -9,6 +9,10 @@ function App() {
     console.log(imageSrc?.toString());
   }, [webcamRef]);
 
+  const videoConstraints = {
+    facingMode: { exact: "environment" },
+  };
+
   return (
     <>
       <Webcam
@@ -17,6 +21,7 @@ function App() {
         height={360}
         ref={webcamRef}
         screenshotFormat="image/jpeg"
+        videoConstraints={videoConstraints}
       />
       <video id="canvas"></video>
       <button id="capture" onClick={capture}>
