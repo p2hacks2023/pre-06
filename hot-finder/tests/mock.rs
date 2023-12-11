@@ -5,7 +5,7 @@
 extern crate wasm_bindgen_test;
 use wasm_bindgen_test::*;
 
-use hot_finder::evaluate_hotness_mock;
+use hot_finder::mock::evaluate_hotness_mock;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
