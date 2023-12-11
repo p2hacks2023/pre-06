@@ -21,7 +21,19 @@ pub fn extract_hot_buffer(img: String) -> String {
 /// For negative input, bigger input than 100.0, and other input that couldn't be parsed to f64, this function returns 0.0
 #[wasm_bindgen]
 pub fn evaluate_hotness_mock(test_value: String) -> f64 {
-    0.0
+    match test_value.parse::<f64>() {
+        Ok(v) => {
+            if 0.0 <= v && v <= 100.0 {
+                v
+            }
+            else {
+                0.0f64
+            }
+        },
+        Err(_) => {
+            0.0f64
+        }
+    }
 }
 
 /// Mock of "extract_hot_buffer()"
