@@ -1,24 +1,32 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+import GameExecutor from "./engine/executor";
+import ExecuteVideoElement from "./engine/video/exec";
+import "./style.css";
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+function startGame(availableEvents: string[] = []) {
+  const videoElement = document.createElement("video");
+  ExecuteVideoElement(
+    navigator,
+    videoElement,
+    (videoElement) => {
+      const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const gameExecutor = new GameExecutor(canvas, videoElement);
+      availableEvents.forEach((eventType) => {
+        window.addEventListener(eventType, (event) => {
+          gameExecutor.listen(eventType, event);
+        });
+      });
+      // initial scene
+      gameExecutor.stageScene("take!");
+      gameExecutor.invokeProcess();
+    },
+    (err) => {
+      console.log(err);
+    },
+  );
+}
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+window.onload = () => {
+  startGame(["click"]);
+};
