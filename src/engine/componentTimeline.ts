@@ -57,7 +57,7 @@ export function InitializeComponents(
     new Icecup(
       new Bound(
         canvas.width / 2 - icecupWidth / 2,
-        canvas.height - icecupWidth / 2,
+        canvas.height,
         icecupWidth,
         icecupWidth,
       ),
