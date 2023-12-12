@@ -6,14 +6,14 @@ class Button implements Component {
   round: number;
   text: string;
   color: string | CanvasGradient | CanvasPattern;
-  onClickCallback: () => void;
+  onClickCallback?: () => void;
 
   constructor(
     bound: Bound,
     round: number,
     text: string,
     color: string | CanvasGradient | CanvasPattern,
-    onClickCallback: () => void
+    onClickCallback?: () => void
   ) {
     this.bound = bound;
     this.round = round;
@@ -82,7 +82,9 @@ class Button implements Component {
   }
 
   onClick(_: MouseEvent): void {
-    this.onClickCallback();
+    if (this.onClickCallback) {
+      this.onClickCallback();
+    }
   }
 }
 
