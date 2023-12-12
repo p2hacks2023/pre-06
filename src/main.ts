@@ -2,6 +2,8 @@ import GameExecutor from "./engine/executor";
 import ExecuteVideoElement from "./engine/video/exec";
 import "./style.css";
 
+// ゲームを開始する
+// 有効なイベントを引数として指定することで、そのイベントをゲームに反映させる
 function startGame(availableEvents: string[] = []) {
   const videoElement = document.createElement("video");
   ExecuteVideoElement(
@@ -17,8 +19,9 @@ function startGame(availableEvents: string[] = []) {
           gameExecutor.listen(eventType, event);
         });
       });
-      // initial scene
+      // 最初のシーンを設定
       gameExecutor.stageScene("take!");
+      // 処理を開始
       gameExecutor.invokeProcess();
     },
     (err) => {

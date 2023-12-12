@@ -4,6 +4,8 @@ import { InitializeComponents, Scene } from "./componentTimeline";
 import Point from "./geometry/point";
 import { TouchEndEvent, TouchMoveEvent } from "./model/event";
 
+// HTML/Canvas/Videoの機能を抽象化し、ゲームとしてプロセスを実行するクラス
+// 主な役割は、フレーム管理、コンポーネント管理、入力イベントの分配
 class GameExecutor {
   private scene: Scene;
   private canvas: HTMLCanvasElement;
@@ -23,12 +25,15 @@ class GameExecutor {
     this.touchingComponentIndex = null;
   }
 
+  // 処理を開始する
+  // 一度呼ばれると、this.processFrameを経由して再帰的に呼ばれ続ける
   invokeProcess() {
     window.requestAnimationFrame(() => {
       this.processFrame();
     });
   }
 
+  // シーンを変更する
   stageScene(scene: Scene) {
     const components = this.componentContainer.queryEnabledComponents([
       this.scene,
@@ -49,6 +54,7 @@ class GameExecutor {
     }
   }
 
+  // 画面が擦られたかどうかを判定し、そうである場合は各コンポーネントのonScratchを呼び出す
   private invokeOnScratchEvent(currentCursor: Point, components: Component[]) {
     this.scratchCursorQueue.push(currentCursor);
 
@@ -76,6 +82,7 @@ class GameExecutor {
     }
   }
 
+  // イベントを受け取る
   listen(eventType: string, event: Event) {
     event.stopPropagation();
 
@@ -83,6 +90,8 @@ class GameExecutor {
       this.scene,
     ]);
 
+    // 各イベントに対してパターンマッチング
+    // 有効なイベントの種類は、main.tsにてstartGameの引数として渡される
     switch (eventType) {
       case "touchmove": {
         const touchMoveEvent = new TouchMoveEvent(event as TouchEvent);
@@ -143,6 +152,7 @@ class GameExecutor {
     }
   }
 
+  // フレームが更新されたときの処理。主に描画を行う
   processFrame() {
     const context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     context.clearRect(0, 0, this.canvas.width, this.canvas.height);
