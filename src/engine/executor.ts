@@ -3,7 +3,6 @@ import ComponentContainer from "./componentContainer";
 import { InitializeComponents, Scene } from "./componentTimeline";
 import Point from "./geometry/point";
 
-
 class GameExecutor {
   private scene: Scene;
   private canvas: HTMLCanvasElement;
@@ -48,18 +47,18 @@ class GameExecutor {
   }
 
   private invokeOnScratchEvent(currentCursor: Point, components: Component[]) {
-    
     this.touchMoveQueue.push(currentCursor);
 
     const minWindowSize = Math.min(this.canvas.width, this.canvas.height);
-    
+
     if (this.touchMoveQueue.length > 15) {
       const poppedCursor = this.touchMoveQueue.shift() as Point;
       const currentCursorDiff = poppedCursor.sub(currentCursor);
       if (
         (currentCursorDiff.x >= 0 != this.previousCursorDiff.x >= 0 ||
           currentCursorDiff.y >= 0 != this.previousCursorDiff.y >= 0) &&
-        currentCursorDiff.squaredDistance(this.previousCursorDiff) > (minWindowSize*0.01)**2
+        currentCursorDiff.squaredDistance(this.previousCursorDiff) >
+          (minWindowSize * 0.01) ** 2
       ) {
         components.forEach((component) => {
           if (
@@ -94,7 +93,7 @@ class GameExecutor {
           }
         });
         break;
-      case "mousemove":{
+      case "mousemove": {
         const mouseMoveEvent = event as MouseEvent;
         const currentCursor = new Point(
           mouseMoveEvent.offsetX,
@@ -103,7 +102,7 @@ class GameExecutor {
         this.invokeOnScratchEvent(currentCursor, components);
         break;
       }
-      case "touchmove":{
+      case "touchmove": {
         const touchEvent = event as TouchEvent;
         const moveX = touchEvent.changedTouches[0].pageX;
         const moveY = touchEvent.changedTouches[0].pageY;

@@ -44,17 +44,19 @@ class ScratchableImage implements Component {
     this.hotPixelCount = 0;
     this.initialHotPixelCount = 0;
     this.nextFallgroup = 0;
-    this.scratchRadius = Math.min(this.bound.width,this.bound.height) * SCRATCH_RADIUS_NORMAL_RATIO;
+    this.scratchRadius =
+      Math.min(this.bound.width, this.bound.height) *
+      SCRATCH_RADIUS_NORMAL_RATIO;
   }
 
   setImageData(imageData: ImageData) {
     this.imageData = imageData;
-    
+
     for (let i = 0; i < this.imageData.width * this.imageData.height; i++) {
       this.fallgroup.push(-1);
       const [x, y] = getXY(i, this.imageData.width);
       this.hotPixel.push(this.isHotPixel(x, y));
-      if(this.hotPixel[i]){
+      if (this.hotPixel[i]) {
         this.hotPixelCount += 1;
       }
     }
@@ -65,7 +67,10 @@ class ScratchableImage implements Component {
     // モック用の判定
     const index = getIndex(x, y, this.imageData!.width);
     const data = this.imageData!.data;
-    return data[index * 4 + 0] < data[index * 4 + 1]*1.2 || data[index * 4 + 0] < data[index * 4 + 2]*1.2;
+    return (
+      data[index * 4 + 0] < data[index * 4 + 1] * 1.2 ||
+      data[index * 4 + 0] < data[index * 4 + 2] * 1.2
+    );
   }
 
   draw(context: CanvasRenderingContext2D) {
@@ -74,13 +79,13 @@ class ScratchableImage implements Component {
     }
 
     // 全てのfalltimeを更新
-    for(let i = 0; i < this.falltime.length; i++){
-      if(this.falltime[i] < 0){
+    for (let i = 0; i < this.falltime.length; i++) {
+      if (this.falltime[i] < 0) {
         continue;
       }
       this.falltime[i] += 1;
     }
-    
+
     const width = this.imageData.width;
     const height = this.imageData.height;
     const data = this.imageData.data;
@@ -89,8 +94,8 @@ class ScratchableImage implements Component {
 
     for (let i = 0; i < width * height; i++) {
       const fallgroup = this.fallgroup[i];
-      if(fallgroup < 0 || !this.hotPixel[i]){
-        if(scratchedImageBuffer[i * 4 + 3] > 0){
+      if (fallgroup < 0 || !this.hotPixel[i]) {
+        if (scratchedImageBuffer[i * 4 + 3] > 0) {
           continue;
         }
         scratchedImageBuffer[i * 4 + 0] = data[i * 4 + 0];
@@ -98,15 +103,15 @@ class ScratchableImage implements Component {
         scratchedImageBuffer[i * 4 + 2] = data[i * 4 + 2];
         scratchedImageBuffer[i * 4 + 3] = data[i * 4 + 3];
       } else {
-        if(this.falltime[fallgroup] < 0){
+        if (this.falltime[fallgroup] < 0) {
           continue;
         }
 
-        let fallHeight = groupFallHeight[fallgroup]
-        if(groupFallHeight[fallgroup] < 0){
-            const falltime = this.falltime[fallgroup];
-            fallHeight = falltime*falltime*GRAVITY*0.5;
-            groupFallHeight[fallgroup] = fallHeight;
+        let fallHeight = groupFallHeight[fallgroup];
+        if (groupFallHeight[fallgroup] < 0) {
+          const falltime = this.falltime[fallgroup];
+          fallHeight = falltime * falltime * GRAVITY * 0.5;
+          groupFallHeight[fallgroup] = fallHeight;
         }
         const [x, y] = getXY(i, width);
         const dy = y + fallHeight;
@@ -118,9 +123,12 @@ class ScratchableImage implements Component {
 
         const whiteProp = this.falltime[fallgroup] / FALL_TIME_WHITE;
 
-        scratchedImageBuffer[debrisIndex * 4 + 0] = data[i * 4 + 0]*(1-whiteProp)+255*whiteProp;
-        scratchedImageBuffer[debrisIndex * 4 + 1] = data[i * 4 + 1]*(1-whiteProp)+255*whiteProp;
-        scratchedImageBuffer[debrisIndex * 4 + 2] = data[i * 4 + 2]*(1-whiteProp)+255*whiteProp;
+        scratchedImageBuffer[debrisIndex * 4 + 0] =
+          data[i * 4 + 0] * (1 - whiteProp) + 255 * whiteProp;
+        scratchedImageBuffer[debrisIndex * 4 + 1] =
+          data[i * 4 + 1] * (1 - whiteProp) + 255 * whiteProp;
+        scratchedImageBuffer[debrisIndex * 4 + 2] =
+          data[i * 4 + 2] * (1 - whiteProp) + 255 * whiteProp;
         scratchedImageBuffer[debrisIndex * 4 + 3] = data[i * 4 + 3];
       }
     }
@@ -134,23 +142,25 @@ class ScratchableImage implements Component {
 
   // 与えたポイントに対してボロノイ図を導き、その図形を落下させる
   FallCell(start: Point) {
-    
-    const [startx, starty] = [Math.floor(start.x - this.bound.x), Math.floor(start.y - this.bound.y)];
+    const [startx, starty] = [
+      Math.floor(start.x - this.bound.x),
+      Math.floor(start.y - this.bound.y),
+    ];
     const [width, height] = [this.imageData!.width, this.imageData!.height];
 
     const index = getIndex(startx, starty, width);
 
-    if(this.fallgroup[index] >= 0){
+    if (this.fallgroup[index] >= 0) {
       return;
     }
 
     // 局所的なボロノイ図を作る
     const voronoiPoints = [[startx, starty]];
     let angle = 0.0;
-    const minAngle = Math.PI/3;
-    const maxAngle = Math.PI/2.2;
-    
-    while(angle < 2*Math.PI-minAngle){
+    const minAngle = Math.PI / 3;
+    const maxAngle = Math.PI / 2.2;
+
+    while (angle < 2 * Math.PI - minAngle) {
       const random = Math.random() * (maxAngle - minAngle) + minAngle;
       angle += random;
       const radius = Math.random() * this.scratchRadius + this.scratchRadius;
@@ -161,7 +171,7 @@ class ScratchableImage implements Component {
 
     let stack = [[startx, starty]];
 
-    while(stack.length > 0){
+    while (stack.length > 0) {
       const [x, y] = stack.pop() as [number, number];
       const index = getIndex(x, y, width);
       if (this.fallgroup[index] >= 0) {
@@ -171,8 +181,10 @@ class ScratchableImage implements Component {
       let minSqDistance = Number.MAX_VALUE;
       let minIndex = 0;
       voronoiPoints.forEach((_, index) => {
-        const distance = (x - voronoiPoints[index][0])**2 + (y - voronoiPoints[index][1])**2;
-        if(distance < minSqDistance){
+        const distance =
+          (x - voronoiPoints[index][0]) ** 2 +
+          (y - voronoiPoints[index][1]) ** 2;
+        if (distance < minSqDistance) {
           minSqDistance = distance;
           minIndex = index;
         }
@@ -185,27 +197,30 @@ class ScratchableImage implements Component {
       this.hotPixelCount -= 1;
       // 4方向に伝播
       // up
-      if(x-1 >= 0 && this.fallgroup[(x-1) + y*width] < 0){
-        stack.push([x-1, y]);
+      if (x - 1 >= 0 && this.fallgroup[x - 1 + y * width] < 0) {
+        stack.push([x - 1, y]);
       }
       // down
-      if(x+1 < width && this.fallgroup[(x+1) + y*width] < 0){
-        stack.push([x+1, y]);
+      if (x + 1 < width && this.fallgroup[x + 1 + y * width] < 0) {
+        stack.push([x + 1, y]);
       }
       // left
-      if(y-1 >= 0 && this.fallgroup[x + (y-1)*width] < 0){
-        stack.push([x, y-1]);
+      if (y - 1 >= 0 && this.fallgroup[x + (y - 1) * width] < 0) {
+        stack.push([x, y - 1]);
       }
       // right
-      if(y+1 < height && this.fallgroup[x + (y+1)*width] < 0){
-        stack.push([x, y+1]);
+      if (y + 1 < height && this.fallgroup[x + (y + 1) * width] < 0) {
+        stack.push([x, y + 1]);
       }
     }
     this.falltime.push(0);
     this.nextFallgroup += 1;
 
     // (ほぼ)全てのピクセルが落下したらコールバックを呼ぶ
-    if(this.hotPixelCount < this.initialHotPixelCount*SCRATCH_FINISH_THRESHOLD){
+    if (
+      this.hotPixelCount <
+      this.initialHotPixelCount * SCRATCH_FINISH_THRESHOLD
+    ) {
       this.scratchFinishCallback();
     }
   }
@@ -213,7 +228,7 @@ class ScratchableImage implements Component {
   onScratch(previousCursor: Point, currentCursor: Point): void {
     const distance = previousCursor.distance(currentCursor);
     let startDistance = 0.0;
-    while(startDistance < distance){
+    while (startDistance < distance) {
       const t = startDistance / distance;
       const scratchPoint = currentCursor.lerp(previousCursor, t);
       this.FallCell(scratchPoint);
