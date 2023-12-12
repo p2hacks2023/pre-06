@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-use base64::{Engine as _, alphabet, engine::{self, general_purpose}};
+use base64::{Engine as _, engine::general_purpose};
 
 #[wasm_bindgen]
 pub fn img_to_base64(img: Vec<u8>, put_html_data_header: bool) -> String {
