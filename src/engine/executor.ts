@@ -2,22 +2,25 @@ import { Component } from "./component/component";
 import ComponentContainer from "./componentContainer";
 import { InitializeComponents, Scene } from "./componentTimeline";
 import Point from "./geometry/point";
+import { TouchEndEvent, TouchMoveEvent } from "./model/event";
 
 class GameExecutor {
   private scene: Scene;
   private canvas: HTMLCanvasElement;
   private videoElement: HTMLVideoElement;
   private componentContainer: ComponentContainer;
-  private touchMoveQueue: Point[];
+  private scratchCursorQueue: Point[];
   private previousCursorDiff: Point;
+  private touchingComponentIndex: number | null;
 
   constructor(canvas: HTMLCanvasElement, videoElement: HTMLVideoElement) {
     this.scene = "none";
     this.canvas = canvas;
     this.videoElement = videoElement;
     this.componentContainer = InitializeComponents(this, canvas, videoElement);
-    this.touchMoveQueue = [];
+    this.scratchCursorQueue = [];
     this.previousCursorDiff = new Point(-1, -1);
+    this.touchingComponentIndex = null;
   }
 
   invokeProcess() {
@@ -47,12 +50,12 @@ class GameExecutor {
   }
 
   private invokeOnScratchEvent(currentCursor: Point, components: Component[]) {
-    this.touchMoveQueue.push(currentCursor);
+    this.scratchCursorQueue.push(currentCursor);
 
     const minWindowSize = Math.min(this.canvas.width, this.canvas.height);
 
-    if (this.touchMoveQueue.length > 15) {
-      const poppedCursor = this.touchMoveQueue.shift() as Point;
+    if (this.scratchCursorQueue.length > 15) {
+      const poppedCursor = this.scratchCursorQueue.shift() as Point;
       const currentCursorDiff = poppedCursor.sub(currentCursor);
       if (
         (currentCursorDiff.x >= 0 != this.previousCursorDiff.x >= 0 ||
@@ -74,7 +77,6 @@ class GameExecutor {
   }
 
   listen(eventType: string, event: Event) {
-    event.preventDefault();
     event.stopPropagation();
 
     const components = this.componentContainer.queryEnabledComponents([
@@ -82,32 +84,60 @@ class GameExecutor {
     ]);
 
     switch (eventType) {
-      case "click":
-        const mouseEvent = event as MouseEvent;
-        components.forEach((component) => {
+      case "touchmove": {
+        const touchMoveEvent = new TouchMoveEvent(event as TouchEvent);
+        this.invokeOnScratchEvent(
+          new Point(touchMoveEvent.pageX, touchMoveEvent.pageY),
+          components,
+        );
+        components.forEach((component, index) => {
           if (
-            component.onClick &&
-            component.bound.includes(mouseEvent.offsetX, mouseEvent.offsetY)
+            component.onTouchMove &&
+            component.bound.includes(touchMoveEvent.pageX, touchMoveEvent.pageY)
           ) {
-            component.onClick(mouseEvent);
+            component.onTouchMove(touchMoveEvent);
+          }
+          if (
+            index == this.touchingComponentIndex &&
+            component.onTouchEnd &&
+            !component.bound.includes(
+              touchMoveEvent.pageX,
+              touchMoveEvent.pageY,
+            )
+          ) {
+            component.onTouchEnd(touchMoveEvent);
+            this.touchingComponentIndex = null;
           }
         });
         break;
-      case "mousemove": {
-        const mouseMoveEvent = event as MouseEvent;
-        const currentCursor = new Point(
-          mouseMoveEvent.offsetX,
-          mouseMoveEvent.offsetY,
-        );
-        this.invokeOnScratchEvent(currentCursor, components);
+      }
+      case "touchstart": {
+        const touchStartEvent = new TouchMoveEvent(event as TouchEvent);
+        components.forEach((component, index) => {
+          if (
+            component.onTouchStart &&
+            component.bound.includes(
+              touchStartEvent.pageX,
+              touchStartEvent.pageY,
+            )
+          ) {
+            component.onTouchStart(touchStartEvent);
+            this.touchingComponentIndex = index;
+          }
+        });
         break;
       }
-      case "touchmove": {
-        const touchEvent = event as TouchEvent;
-        const moveX = touchEvent.changedTouches[0].pageX;
-        const moveY = touchEvent.changedTouches[0].pageY;
-        const currentCursor = new Point(moveX, moveY);
-        this.invokeOnScratchEvent(currentCursor, components);
+      case "touchend": {
+        const touchEndEvent = new TouchEndEvent(event as TouchEvent);
+        components.forEach((component) => {
+          if (
+            component.onTouchEnd &&
+            component.bound.includes(touchEndEvent.pageX, touchEndEvent.pageY)
+          ) {
+            component.onTouchEnd(touchEndEvent);
+          }
+        });
+        this.scratchCursorQueue = [];
         break;
       }
     }

@@ -1,4 +1,5 @@
 import Bound from "../geometry/bound";
+import { TouchEndEvent } from "../model/event";
 import { Component } from "./component";
 
 class Shatter implements Component {
@@ -32,7 +33,7 @@ class Shatter implements Component {
     context.fill();
   }
 
-  onClick(_: MouseEvent) {
+  onTouchEnd(_: TouchEndEvent): void {
     this.shotCallback(this.videoElement);
   }
 }

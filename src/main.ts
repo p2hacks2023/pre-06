@@ -28,5 +28,5 @@ function startGame(availableEvents: string[] = []) {
 }
 
 window.onload = () => {
-  startGame(["click", "touchmove", "mousemove"]);
+  startGame(["touchmove", "touchstart", "touchend"]);
 };
