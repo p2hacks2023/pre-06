@@ -1,5 +1,5 @@
 mod utils;
-mod img_util;
+pub mod img_util;
 pub mod mock;
 
 use wasm_bindgen::prelude::*;
