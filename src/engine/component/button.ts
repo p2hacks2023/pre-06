@@ -4,12 +4,22 @@ import { Component } from "./component";
 class Button implements Component {
   bound: Bound;
   round: number;
+  text: string;
   color: string | CanvasGradient | CanvasPattern;
+  onClickCallback: () => void;
 
-  constructor(bound: Bound, round: number, color: string | CanvasGradient | CanvasPattern) {
+  constructor(
+    bound: Bound,
+    round: number,
+    text: string,
+    color: string | CanvasGradient | CanvasPattern,
+    onClickCallback: () => void
+  ) {
     this.bound = bound;
-    this.round = round
+    this.round = round;
+    this.text = text;
     this.color = color;
+    this.onClickCallback = onClickCallback;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -17,15 +27,62 @@ class Button implements Component {
     ctx.beginPath();
     ctx.moveTo(this.bound.x + this.round, this.bound.y);
     ctx.lineTo(this.bound.x + this.bound.width - this.round, this.bound.y);
-    ctx.arc(this.bound.x + this.bound.width - this.round, this.bound.y + this.round, this.round, Math.PI * (3/2), 0, false);
-    ctx.lineTo(this.bound.x + this.bound.width, this.bound.y + this.bound.height - this.round);
-    ctx.arc(this.bound.x + this.bound.width - this.round, this.bound.y + this.bound.height - this.round, this.round, 0, Math.PI * (1/2), false);
-    ctx.lineTo(this.bound.x + this.round, this.bound.y + this.bound.height);       
-    ctx.arc(this.bound.x + this.round, this.bound.y + this.bound.height - this.round, this.round, Math.PI * (1/2), Math.PI, false);
+    ctx.arc(
+      this.bound.x + this.bound.width - this.round,
+      this.bound.y + this.round,
+      this.round,
+      Math.PI * (3 / 2),
+      0,
+      false
+    );
+    ctx.lineTo(
+      this.bound.x + this.bound.width,
+      this.bound.y + this.bound.height - this.round
+    );
+    ctx.arc(
+      this.bound.x + this.bound.width - this.round,
+      this.bound.y + this.bound.height - this.round,
+      this.round,
+      0,
+      Math.PI * (1 / 2),
+      false
+    );
+    ctx.lineTo(this.bound.x + this.round, this.bound.y + this.bound.height);
+    ctx.arc(
+      this.bound.x + this.round,
+      this.bound.y + this.bound.height - this.round,
+      this.round,
+      Math.PI * (1 / 2),
+      Math.PI,
+      false
+    );
     ctx.lineTo(this.bound.x, this.bound.y + this.round);
-    ctx.arc(this.bound.x + this.round, this.bound.y + this.round, this.round, Math.PI, Math.PI * (3/2), false);
+    ctx.arc(
+      this.bound.x + this.round,
+      this.bound.y + this.round,
+      this.round,
+      Math.PI,
+      Math.PI * (3 / 2),
+      false
+    );
     ctx.closePath();
     ctx.fill();
+
+    const textSize = 48;
+    const textWidth = ctx.measureText(this.text).width;
+
+    ctx.font = `${textSize}px "Meiryo UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Yu Gothic UI", sans-serif`;
+    ctx.fillStyle = "#fff";
+    ctx.fillText(
+      this.text,
+      this.bound.x + this.bound.width / 2 - textWidth / 2,
+      this.bound.y + this.bound.height / 2 + textSize / 2 - 7
+    );
+  }
+
+  onClick(_: MouseEvent): void {
+    this.onClickCallback();
   }
 }
 
