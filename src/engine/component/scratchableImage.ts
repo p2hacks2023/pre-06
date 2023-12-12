@@ -2,10 +2,12 @@ import Bound from "../geometry/bound";
 import Point from "../geometry/point";
 import { Component } from "./component";
 
+// 画面の大きさに対する、落とす図形の半径の大きさ
 const SCRATCH_RADIUS_NORMAL_RATIO = 0.1;
-const GRAVITY = 2;
+// 重力加速度 (2の倍数であると良い)
+const GRAVITY = 4;
+// 落下してからの時間がこの値を超えたら図形が白くなる
 const FALL_TIME_WHITE = 20;
-const SCRATCH_FINISH_THRESHOLD = 0.2;
 
 function getIndex(x: number, y: number, width: number) {
   return y * width + x;
@@ -19,8 +21,8 @@ class ScratchableImage implements Component {
   bound: Bound;
   // もととなる画像
   private imageData: ImageData | null;
-  // scratchが終わった時に呼ばれるコールバック
-  private scratchFinishCallback: () => void;
+  // 落下した図形が増えた時に呼ばれるコールバック
+  private fallCallback: (hotProp: number) => void;
   // 落下する図形のグループ
   private fallgroup: number[];
   // 次に落下する図形のグループのindex
@@ -33,11 +35,14 @@ class ScratchableImage implements Component {
   private hotPixelCount: number;
   // 落とす図形の半径
   private scratchRadius: number;
+  // satisfied時に画像全体が向かうy座標
+  private goalY: number | null;
 
-  constructor(bound: Bound, scratchFinishCallback: () => void) {
+  constructor(bound: Bound, fallCallback: (hotProp: number) => void) {
     this.bound = bound;
+    this.goalY = null;
     this.imageData = null;
-    this.scratchFinishCallback = scratchFinishCallback;
+    this.fallCallback = fallCallback;
     this.fallgroup = [];
     this.falltime = [];
     this.hotPixel = [];
@@ -138,6 +143,11 @@ class ScratchableImage implements Component {
       this.bound.x,
       this.bound.y,
     );
+
+    if (this.goalY != null) {
+      this.bound.y = (this.bound.y - this.goalY) * 0.95 + this.goalY;
+      return;
+    }
   }
 
   // 与えたポイントに対してボロノイ図を導き、その図形を落下させる
@@ -216,16 +226,21 @@ class ScratchableImage implements Component {
     this.falltime.push(0);
     this.nextFallgroup += 1;
 
-    // (ほぼ)全てのピクセルが落下したらコールバックを呼ぶ
-    if (
-      this.hotPixelCount <
-      this.initialHotPixelCount * SCRATCH_FINISH_THRESHOLD
-    ) {
-      this.scratchFinishCallback();
-    }
+    const hotPixelRatio = this.hotPixelCount / this.initialHotPixelCount;
+
+    this.fallCallback(hotPixelRatio);
+  }
+
+  onSceneChanged(): void {
+    // 画面上部に移動させる
+    this.goalY = -this.bound.height * 1.5;
   }
 
   onScratch(previousCursor: Point, currentCursor: Point): void {
+    if (this.goalY != null) {
+      return;
+    }
+
     const distance = previousCursor.distance(currentCursor);
     let startDistance = 0.0;
     while (startDistance < distance) {
