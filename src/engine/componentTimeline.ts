@@ -9,6 +9,11 @@ import { CropImageFromVideo } from "./video/crop";
 
 export type Scene = "none" | "take!" | "scratch!" | "satisfied";
 
+// scratch!シーンを終える条件となる、残りアツピクセル比率のしきい値
+const SCRATCH_FINISH_HOTPROP_THRESHOLD = 0.15;
+// かき氷が下から上に向かってくるときの、かき氷の見える部分の(かき氷の大きさに対する)最大割合
+const ICECUP_RAISING_RATIO = 0.5;
+
 export function InitializeComponents(
   router: GameRouter,
   canvas: HTMLCanvasElement,
@@ -16,13 +21,17 @@ export function InitializeComponents(
 ) {
   let componentContainer: ComponentContainer = new ComponentContainer();
 
+  let hotPropChanged: (hotProp: number) => void;
   const scratchableImage = new ScratchableImage(
     new Bound(0, 0, canvas.width, canvas.height),
-    () => {
-      router.stageScene("satisfied");
+    (hotProp) => {
+      if (hotProp < SCRATCH_FINISH_HOTPROP_THRESHOLD) {
+        router.stageScene("satisfied");
+      }
+      hotPropChanged(hotProp);
     },
   );
-  componentContainer.addComponent(scratchableImage, ["scratch!"]);
+  componentContainer.addComponent(scratchableImage, ["scratch!", "satisfied"]);
 
   componentContainer.addComponent(
     new VideoPreview(
@@ -53,19 +62,22 @@ export function InitializeComponents(
   );
 
   const icecupWidth = Math.min(canvas.width, canvas.height) * 1.25;
-  componentContainer.addComponent(
-    new Icecup(
-      new Bound(
-        canvas.width / 2 - icecupWidth / 2,
-        canvas.height - icecupWidth / 2,
-        icecupWidth,
-        icecupWidth,
-      ),
-      canvas.width,
+  const icecup = new Icecup(
+    new Bound(
+      canvas.width / 2 - icecupWidth / 2,
       canvas.height,
+      icecupWidth,
+      icecupWidth,
     ),
-    ["scratch!", "satisfied"],
+    canvas.width,
+    canvas.height,
   );
+  componentContainer.addComponent(icecup, ["scratch!", "satisfied"]);
+
+  hotPropChanged = (hotProp) => {
+    icecup.bound.y =
+      canvas.height - icecupWidth * (1.0 - hotProp) * ICECUP_RAISING_RATIO;
+  };
 
   return componentContainer;
 }

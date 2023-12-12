@@ -32,7 +32,7 @@ class Icecup implements Component {
   draw(context: CanvasRenderingContext2D) {
     if (this.clock >= 0) {
       this.clock += 1;
-      this.bound.animateTo(this.goalBound, 0.1);
+      this.bound.animateTo(this.goalBound, 0.05);
     }
     if (this.image) {
       context.drawImage(
