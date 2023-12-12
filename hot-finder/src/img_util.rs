@@ -2,8 +2,25 @@ use wasm_bindgen::prelude::*;
 
 use base64::{Engine as _, alphabet, engine::{self, general_purpose}};
 
-fn img_to_base64(img: Vec<u8>) -> String {
-    todo!{}
+#[wasm_bindgen]
+pub fn img_to_base64(img: Vec<u8>, put_html_data_header: bool) -> String {
+    let html_data_header = if put_html_data_header {
+        println!{"bytedata: {:?}", img[0..10].to_vec()};
+        if img[6..9] == [0x4A, 0x46, 0x49, 0x46] {
+            "data:image/jpeg;base64,"
+        }
+        else if img[0..8] == [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A] {
+            "data:image/png;base64,"
+        }
+        else {
+            ""
+        }
+    }
+    else {
+        ""
+    };
+
+    (html_data_header.to_owned() + &general_purpose::STANDARD.encode(img)).to_string()
 }
 
 #[wasm_bindgen]
