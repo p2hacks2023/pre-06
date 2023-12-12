@@ -2,6 +2,9 @@ use wasm_bindgen::prelude::*;
 
 use base64::{Engine as _, engine::general_purpose};
 
+/// Convert an image binary (Vec<u8>) to a base64 (String).
+/// You can choose to put an html data header (e.g., "data:image/jpeg;base64") or not.
+/// To put an html data header, put 'true' to the second parameter of the function.
 #[wasm_bindgen]
 pub fn img_to_base64(img: Vec<u8>, put_html_data_header: bool) -> String {
     let html_data_header = if put_html_data_header {
@@ -22,6 +25,8 @@ pub fn img_to_base64(img: Vec<u8>, put_html_data_header: bool) -> String {
     (html_data_header.to_owned() + &general_purpose::STANDARD.encode(img)).to_string()
 }
 
+/// Convert a base64 string to an image binary (Vec<u8>).
+/// Both base64 that has an html data header and that doesn't are allowed.
 #[wasm_bindgen]
 pub fn base64_to_img(data: String) -> Vec<u8> {
     // strip_pos = 21 iff the data is an HTML inline image and a PNG.
