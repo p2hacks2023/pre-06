@@ -45,3 +45,22 @@ fn img_to_base64_with_htmlheader() {
     let res = format!{"data:image/png;base64,{}", DATA};
     assert_eq!(img_to_base64(CORRECT_BYTE_DATA.to_vec(), true), res);
 }
+
+#[wasm_bindgen_test]
+fn check_img_data_equivalent() {
+    let original: String = format!{"data:image/png;base64,{}", DATA};
+    let mid = base64_to_img(original.clone());
+    assert_eq!(img_to_base64(mid.clone(), false), DATA);
+    assert_eq!(img_to_base64(mid, true), original);
+}
+
+#[wasm_bindgen_test]
+fn img_to_base64_jpeg_mock() {
+    // First 32 bytes of real jpeg img
+    let origin: Vec<u8> = vec![0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x02, 0x00, 0x1c, 0x00, 0x1c, 0x00, 0x00, 0xff, 0xe1, 0x07, 0xd2, 0x45, 0x78, 0x69, 0x66, 0x00, 0x00, 0x49, 0x49];
+    let res1 = "/9j/4AAQSkZJRgABAQIAHAAcAAD/4QfSRXhpZgAASUk=".to_string();
+    let res2 = format!{"data:image/jpeg;base64,{}", &res1};
+
+    assert_eq!(img_to_base64(origin.clone(), false), res1);
+    assert_eq!(img_to_base64(origin, true), res2);
+}
