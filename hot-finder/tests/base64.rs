@@ -34,3 +34,14 @@ fn base64_to_img_byte_with_htmlheader() {
     let res = CORRECT_BYTE_DATA.to_vec();
     assert_eq!(base64_to_img(original), res);
 }
+
+#[wasm_bindgen_test]
+fn img_to_base64_without_htmlheader() {
+    assert_eq!(img_to_base64(CORRECT_BYTE_DATA.to_vec(), false), DATA.to_string());
+}
+
+#[wasm_bindgen_test]
+fn img_to_base64_with_htmlheader() {
+    let res = format!{"data:image/png;base64,{}", DATA};
+    assert_eq!(img_to_base64(CORRECT_BYTE_DATA.to_vec(), true), res);
+}
