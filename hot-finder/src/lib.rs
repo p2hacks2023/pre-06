@@ -1,4 +1,5 @@
 mod utils;
+mod hsv;
 pub mod img_util;
 pub mod mock;
 
