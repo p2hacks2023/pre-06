@@ -1,6 +1,7 @@
 import Bound from "../geometry/bound";
 import Point from "../geometry/point";
 import { TouchEndEvent, TouchMoveEvent, TouchStartEvent } from "../model/event";
+import { Scene } from "../model/scene";
 
 export interface Component {
   // コンポーネントの領域
@@ -13,7 +14,7 @@ export interface Component {
   onScratch?(previousCursor: Point, currentCursor: Point): void;
 
   // シーンが変化した時 (ただし、コンポーネントが前後両方のシーンで有効である必要がある)
-  onSceneChanged?(): void;
+  onSceneChanged?(previousScene: Scene, currentScene: Scene): void;
 
   // タッチされた最初のフレームの時
   onTouchStart?(event: TouchStartEvent): void;

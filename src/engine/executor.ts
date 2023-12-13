@@ -1,8 +1,9 @@
 import { Component } from "./component/component";
 import ComponentContainer from "./componentContainer";
-import { InitializeComponents, Scene } from "./componentTimeline";
+import { InitializeComponents } from "./componentTimeline";
 import Point from "./geometry/point";
 import { TouchEndEvent, TouchMoveEvent } from "./model/event";
+import { Scene } from "./model/scene";
 
 // HTML/Canvas/Videoの機能を抽象化し、ゲームとしてプロセスを実行するクラス
 // 主な役割は、フレーム管理、コンポーネント管理、入力イベントの分配
@@ -19,7 +20,7 @@ class GameExecutor {
     this.scene = "none";
     this.canvas = canvas;
     this.videoElement = videoElement;
-    this.componentContainer = InitializeComponents(this, canvas, videoElement);
+    this.componentContainer = new ComponentContainer();
     this.scratchCursorQueue = [];
     this.previousCursorDiff = new Point(-1, -1);
     this.touchingComponentIndex = null;
@@ -41,13 +42,18 @@ class GameExecutor {
     ]);
     components.forEach((component) => {
       if (component.onSceneChanged) {
-        component.onSceneChanged();
+        component.onSceneChanged(this.scene, scene);
       }
     });
 
     this.scene = scene;
 
     if (scene == "take!") {
+      this.componentContainer = InitializeComponents(
+        this,
+        this.canvas,
+        this.videoElement,
+      );
       this.videoElement.play();
     } else {
       this.videoElement.pause();

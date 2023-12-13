@@ -21,6 +21,10 @@ class ScratchableImage implements Component {
   bound: Bound;
   // もととなる画像
   private imageData: ImageData | null;
+  // フラッシュが終わった時に呼ばれるコールバック
+  private flushEndCallback: () => void;
+  // フラッシュの強さ
+  private flushBrightness: number;
   // 落下した図形が増えた時に呼ばれるコールバック
   private fallCallback: (hotProp: number) => void;
   // 落下する図形のグループ
@@ -38,10 +42,16 @@ class ScratchableImage implements Component {
   // satisfied時に画像全体が向かうy座標
   private goalY: number | null;
 
-  constructor(bound: Bound, fallCallback: (hotProp: number) => void) {
+  constructor(
+    bound: Bound,
+    flushEndCallback: () => void,
+    fallCallback: (hotProp: number) => void,
+  ) {
     this.bound = bound;
     this.goalY = null;
     this.imageData = null;
+    this.flushEndCallback = flushEndCallback;
+    this.flushBrightness = 1.0;
     this.fallCallback = fallCallback;
     this.fallgroup = [];
     this.falltime = [];
@@ -148,6 +158,20 @@ class ScratchableImage implements Component {
       this.bound.y = (this.bound.y - this.goalY) * 0.95 + this.goalY;
       return;
     }
+
+    if (this.flushBrightness > 0) {
+      context.fillStyle = `rgba(255, 255, 255, ${this.flushBrightness})`;
+      context.fillRect(
+        this.bound.x,
+        this.bound.y,
+        this.bound.width,
+        this.bound.height,
+      );
+      this.flushBrightness -= 0.05;
+      if (this.flushBrightness <= 0) {
+        this.flushEndCallback();
+      }
+    }
   }
 
   // 与えたポイントに対してボロノイ図を導き、その図形を落下させる
@@ -231,9 +255,11 @@ class ScratchableImage implements Component {
     this.fallCallback(hotPixelRatio);
   }
 
-  onSceneChanged(): void {
-    // 画面上部に移動させる
-    this.goalY = -this.bound.height * 1.5;
+  onSceneChanged(_: string, scene: string): void {
+    if (scene == "finish") {
+      // 画面上部に移動させる
+      this.goalY = -this.bound.height * 1.5;
+    }
   }
 
   onScratch(previousCursor: Point, currentCursor: Point): void {
