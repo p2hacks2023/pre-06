@@ -1,5 +1,5 @@
 import { Component } from "./component/component";
-import { Scene } from "./componentTimeline";
+import { Scene } from "./model/scene";
 
 class ComponentContainer {
   private components: Component[];
