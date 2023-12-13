@@ -64,11 +64,42 @@ mod tests {
     #[test]
     fn to_hsv_light_orange() {
         let origin = Rgba::<u8>([255u8, 191u8, 127u8, 0u8]);
-        let res = Hsv {
-            hue: 30,
-            saturation: 50,
-            value: 100
-        };
+        let res = Hsv { hue: 30.0, saturation: 50.2, value: 100.0 };
+        assert_eq!(to_hsv(&origin), res)
+    }
+
+    #[test]
+    fn to_hsv_marine_blue() {
+        let origin = Rgba::<u8>([62u8, 250u8, 250u8, 0u8]);
+        let res = Hsv { hue: 180.0, saturation: 75.2, value: 98.0 };
+        assert_eq!(to_hsv(&origin), res)
+    }
+
+    #[test]
+    fn to_hsv_corner_white() {
+        let origin = Rgba::<u8>([255u8, 255u8, 255u8, 0u8]);
+        let res = Hsv { hue: 0.0, saturation: 0.0, value: 100.0 };
+        assert_eq!(to_hsv(&origin), res)
+    }
+
+    #[test]
+    fn to_hsv_corner_black() {
+        let origin = Rgba::<u8>([0u8, 0u8, 0u8, 0u8]);
+        let res = Hsv { hue: 0.0, saturation: 0.0, value: 0.0 };
+        assert_eq!(to_hsv(&origin), res)
+    }
+
+    #[test]
+    fn to_hsv_random_1() {
+        let origin = Rgba::<u8>([160u8, 235u8, 190u8, 0u8]);
+        let res = Hsv { hue: 144.0, saturation: 31.9, value: 92.2 };
+        assert_eq!(to_hsv(&origin), res)
+    }
+
+    #[test]
+    fn to_hsv_random_2() {
+        let origin = Rgba::<u8>([193u8, 48u8, 147u8, 0u8]);
+        let res = Hsv { hue: 319.0, saturation: 75.1, value: 75.7 };
         assert_eq!(to_hsv(&origin), res)
     }
 }
