@@ -96,23 +96,20 @@ class GameExecutor {
       case "touchmove": {
         const touchMoveEvent = new TouchMoveEvent(event as TouchEvent);
         this.invokeOnScratchEvent(
-          new Point(touchMoveEvent.pageX, touchMoveEvent.pageY),
+          new Point(touchMoveEvent.x, touchMoveEvent.y),
           components,
         );
         components.forEach((component, index) => {
           if (
             component.onTouchMove &&
-            component.bound.includes(touchMoveEvent.pageX, touchMoveEvent.pageY)
+            component.bound.includes(touchMoveEvent.x, touchMoveEvent.y)
           ) {
             component.onTouchMove(touchMoveEvent);
           }
           if (
             index == this.touchingComponentIndex &&
             component.onTouchEnd &&
-            !component.bound.includes(
-              touchMoveEvent.pageX,
-              touchMoveEvent.pageY,
-            )
+            !component.bound.includes(touchMoveEvent.x, touchMoveEvent.y)
           ) {
             component.onTouchEnd(touchMoveEvent);
             this.touchingComponentIndex = null;
@@ -125,10 +122,7 @@ class GameExecutor {
         components.forEach((component, index) => {
           if (
             component.onTouchStart &&
-            component.bound.includes(
-              touchStartEvent.pageX,
-              touchStartEvent.pageY,
-            )
+            component.bound.includes(touchStartEvent.x, touchStartEvent.y)
           ) {
             component.onTouchStart(touchStartEvent);
             this.touchingComponentIndex = index;
@@ -141,7 +135,7 @@ class GameExecutor {
         components.forEach((component) => {
           if (
             component.onTouchEnd &&
-            component.bound.includes(touchEndEvent.pageX, touchEndEvent.pageY)
+            component.bound.includes(touchEndEvent.x, touchEndEvent.y)
           ) {
             component.onTouchEnd(touchEndEvent);
           }
