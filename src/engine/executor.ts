@@ -2,30 +2,38 @@ import { Component } from "./component/component";
 import ComponentContainer from "./componentContainer";
 import { InitializeComponents, Scene } from "./componentTimeline";
 import Point from "./geometry/point";
+import { TouchEndEvent, TouchMoveEvent } from "./model/event";
 
+// HTML/Canvas/Videoの機能を抽象化し、ゲームとしてプロセスを実行するクラス
+// 主な役割は、フレーム管理、コンポーネント管理、入力イベントの分配
 class GameExecutor {
   private scene: Scene;
   private canvas: HTMLCanvasElement;
   private videoElement: HTMLVideoElement;
   private componentContainer: ComponentContainer;
-  private touchMoveQueue: Point[];
+  private scratchCursorQueue: Point[];
   private previousCursorDiff: Point;
+  private touchingComponentIndex: number | null;
 
   constructor(canvas: HTMLCanvasElement, videoElement: HTMLVideoElement) {
     this.scene = "none";
     this.canvas = canvas;
     this.videoElement = videoElement;
     this.componentContainer = InitializeComponents(this, canvas, videoElement);
-    this.touchMoveQueue = [];
+    this.scratchCursorQueue = [];
     this.previousCursorDiff = new Point(-1, -1);
+    this.touchingComponentIndex = null;
   }
 
+  // 処理を開始する
+  // 一度呼ばれると、this.processFrameを経由して再帰的に呼ばれ続ける
   invokeProcess() {
     window.requestAnimationFrame(() => {
       this.processFrame();
     });
   }
 
+  // シーンを変更する
   stageScene(scene: Scene) {
     const components = this.componentContainer.queryEnabledComponents([
       this.scene,
@@ -46,13 +54,14 @@ class GameExecutor {
     }
   }
 
+  // 画面が擦られたかどうかを判定し、そうである場合は各コンポーネントのonScratchを呼び出す
   private invokeOnScratchEvent(currentCursor: Point, components: Component[]) {
-    this.touchMoveQueue.push(currentCursor);
+    this.scratchCursorQueue.push(currentCursor);
 
     const minWindowSize = Math.min(this.canvas.width, this.canvas.height);
 
-    if (this.touchMoveQueue.length > 15) {
-      const poppedCursor = this.touchMoveQueue.shift() as Point;
+    if (this.scratchCursorQueue.length > 15) {
+      const poppedCursor = this.scratchCursorQueue.shift() as Point;
       const currentCursorDiff = poppedCursor.sub(currentCursor);
       if (
         (currentCursorDiff.x >= 0 != this.previousCursorDiff.x >= 0 ||
@@ -73,46 +82,71 @@ class GameExecutor {
     }
   }
 
+  // イベントを受け取る
   listen(eventType: string, event: Event) {
-    event.preventDefault();
     event.stopPropagation();
 
     const components = this.componentContainer.queryEnabledComponents([
       this.scene,
     ]);
 
+    // 各イベントに対してパターンマッチング
+    // 有効なイベントの種類は、main.tsにてstartGameの引数として渡される
     switch (eventType) {
-      case "click":
-        const mouseEvent = event as MouseEvent;
-        components.forEach((component) => {
+      case "touchmove": {
+        const touchMoveEvent = new TouchMoveEvent(event as TouchEvent);
+        this.invokeOnScratchEvent(
+          new Point(touchMoveEvent.x, touchMoveEvent.y),
+          components,
+        );
+        components.forEach((component, index) => {
           if (
-            component.onClick &&
-            component.bound.includes(mouseEvent.offsetX, mouseEvent.offsetY)
+            component.onTouchMove &&
+            component.bound.includes(touchMoveEvent.x, touchMoveEvent.y)
           ) {
-            component.onClick(mouseEvent);
+            component.onTouchMove(touchMoveEvent);
+          }
+          if (
+            index == this.touchingComponentIndex &&
+            component.onTouchEnd &&
+            !component.bound.includes(touchMoveEvent.x, touchMoveEvent.y)
+          ) {
+            component.onTouchEnd(touchMoveEvent);
+            this.touchingComponentIndex = null;
           }
         });
         break;
-      case "mousemove": {
-        const mouseMoveEvent = event as MouseEvent;
-        const currentCursor = new Point(
-          mouseMoveEvent.offsetX,
-          mouseMoveEvent.offsetY,
-        );
-        this.invokeOnScratchEvent(currentCursor, components);
+      }
+      case "touchstart": {
+        const touchStartEvent = new TouchMoveEvent(event as TouchEvent);
+        components.forEach((component, index) => {
+          if (
+            component.onTouchStart &&
+            component.bound.includes(touchStartEvent.x, touchStartEvent.y)
+          ) {
+            component.onTouchStart(touchStartEvent);
+            this.touchingComponentIndex = index;
+          }
+        });
         break;
       }
-      case "touchmove": {
-        const touchEvent = event as TouchEvent;
-        const moveX = touchEvent.changedTouches[0].pageX;
-        const moveY = touchEvent.changedTouches[0].pageY;
-        const currentCursor = new Point(moveX, moveY);
-        this.invokeOnScratchEvent(currentCursor, components);
+      case "touchend": {
+        const touchEndEvent = new TouchEndEvent(event as TouchEvent);
+        components.forEach((component) => {
+          if (
+            component.onTouchEnd &&
+            component.bound.includes(touchEndEvent.x, touchEndEvent.y)
+          ) {
+            component.onTouchEnd(touchEndEvent);
+          }
+        });
+        this.scratchCursorQueue = [];
         break;
       }
     }
   }
 
+  // フレームが更新されたときの処理。主に描画を行う
   processFrame() {
     const context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     context.clearRect(0, 0, this.canvas.width, this.canvas.height);
