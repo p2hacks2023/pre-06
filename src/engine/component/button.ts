@@ -1,4 +1,5 @@
 import Bound from "../geometry/bound";
+import { TouchEndEvent } from "../model/event";
 import { Component } from "./component";
 
 class Button implements Component {
@@ -84,7 +85,7 @@ class Button implements Component {
     );
   }
 
-  onClick(_: MouseEvent): void {
+  onTouchEnd(_: TouchEndEvent): void {
     if (this.onClickCallback) {
       this.onClickCallback();
     }
