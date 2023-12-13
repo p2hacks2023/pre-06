@@ -43,3 +43,35 @@ pub fn evaluate_hotness(img: String) -> f64 {
 pub fn extract_hot_buffer(img: String) -> String {
     img
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs::File;
+    use std::io::prelude::*;
+    use crate::*;
+
+    // Tests hot_eval_* always pass.
+    // These tests can be used to check and debug.
+
+    #[test]
+    fn hot_eval_yamaokaya() {
+        let mut file = File::open("./test_assets/IMG_4244_resized.png").unwrap();
+        let mut buf: Vec<u8> = Vec::new();
+        file.read_to_end(&mut buf).unwrap();
+
+        let b64_img = img_util::img_to_base64(buf, true);
+        println!{"{}", evaluate_hotness(b64_img)};
+        assert_eq!(1+1, 2);
+    }
+
+    #[test]
+    fn hot_eval_suzuka_gaze_on_me() {
+        let mut file = File::open("./test_assets/F2Wy20pbMAEW0ji.jpeg").unwrap();
+        let mut buf: Vec<u8> = Vec::new();
+        file.read_to_end(&mut buf).unwrap();
+
+        let b64_img = img_util::img_to_base64(buf, true);
+        println!{"{}", evaluate_hotness(b64_img)};
+        assert_eq!(1+1, 2);
+    }
+}
