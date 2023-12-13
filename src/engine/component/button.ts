@@ -5,6 +5,8 @@ class Button implements Component {
   bound: Bound;
   round: number;
   text: string;
+  textSize: number;
+  fontFamily: string[];
   color: string | CanvasGradient | CanvasPattern;
   onClickCallback?: () => void;
 
@@ -12,12 +14,16 @@ class Button implements Component {
     bound: Bound,
     round: number,
     text: string,
+    textSize: number,
+    fontFamily: string[],
     color: string | CanvasGradient | CanvasPattern,
     onClickCallback?: () => void
   ) {
     this.bound = bound;
     this.round = round;
     this.text = text;
+    this.textSize = textSize;
+    this.fontFamily = fontFamily;
     this.color = color;
     this.onClickCallback = onClickCallback;
   }
@@ -68,16 +74,13 @@ class Button implements Component {
     ctx.closePath();
     ctx.fill();
 
-    const textSize = 48;
     const textWidth = ctx.measureText(this.text).width;
-
-    ctx.font = `${textSize}px "Meiryo UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN",
-    "Yu Gothic UI", sans-serif`;
+    ctx.font = `${this.textSize}px '${this.fontFamily.join("', '")}'`;
     ctx.fillStyle = "#fff";
     ctx.fillText(
       this.text,
       this.bound.x + this.bound.width / 2 - textWidth / 2,
-      this.bound.y + this.bound.height / 2 + textSize / 2 - 7
+      this.bound.y + this.bound.height / 2 + this.textSize / 2 - 7
     );
   }
 
