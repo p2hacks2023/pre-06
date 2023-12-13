@@ -117,10 +117,10 @@ export function InitializeComponents(
   const resultButtonWidth = Math.min(canvas.width, canvas.height) * 0.4;
   const resultButton = new Button(
     new Bound(
-      canvas.width / 2 - satisfiedButtonWidth / 2,
-      canvas.height - satisfiedButtonWidth,
-      satisfiedButtonWidth,
-      satisfiedButtonWidth * 0.4,
+      canvas.width / 2 - resultButtonWidth / 2,
+      canvas.height - resultButtonWidth,
+      resultButtonWidth,
+      resultButtonWidth * 0.4,
     ),
     20,
     "again",
