@@ -18,7 +18,7 @@ class Button implements Component {
     textSize: number,
     fontFamily: string[],
     color: string | CanvasGradient | CanvasPattern,
-    onClickCallback?: () => void
+    onClickCallback?: () => void,
   ) {
     this.bound = bound;
     this.round = round;
@@ -40,11 +40,11 @@ class Button implements Component {
       this.round,
       Math.PI * (3 / 2),
       0,
-      false
+      false,
     );
     ctx.lineTo(
       this.bound.x + this.bound.width,
-      this.bound.y + this.bound.height - this.round
+      this.bound.y + this.bound.height - this.round,
     );
     ctx.arc(
       this.bound.x + this.bound.width - this.round,
@@ -52,7 +52,7 @@ class Button implements Component {
       this.round,
       0,
       Math.PI * (1 / 2),
-      false
+      false,
     );
     ctx.lineTo(this.bound.x + this.round, this.bound.y + this.bound.height);
     ctx.arc(
@@ -61,7 +61,7 @@ class Button implements Component {
       this.round,
       Math.PI * (1 / 2),
       Math.PI,
-      false
+      false,
     );
     ctx.lineTo(this.bound.x, this.bound.y + this.round);
     ctx.arc(
@@ -70,7 +70,7 @@ class Button implements Component {
       this.round,
       Math.PI,
       Math.PI * (3 / 2),
-      false
+      false,
     );
     ctx.closePath();
     ctx.fill();
@@ -81,7 +81,7 @@ class Button implements Component {
     ctx.fillText(
       this.text,
       this.bound.x + this.bound.width / 2 - textWidth / 2,
-      this.bound.y + this.bound.height / 2 + this.textSize / 2 - 7
+      this.bound.y + this.bound.height / 2 + this.textSize / 2 - 7,
     );
   }
 

@@ -105,9 +105,11 @@ export function InitializeComponents(
       satisfiedButtonWidth,
       satisfiedButtonWidth * 0.4,
     ),
-    20,
-    "result",
-    "rgb(100, 100, 100)",
+    5,
+    "結果を見る",
+    22,
+    ["Mochiy Pop One", "sans-serif"],
+    "#3388dd",
     () => {
       router.stageScene("syruptime");
     },
@@ -122,9 +124,11 @@ export function InitializeComponents(
       resultButtonWidth,
       resultButtonWidth * 0.4,
     ),
+    5,
+    "もう一度遊ぶ",
     20,
-    "again",
-    "rgb(100, 100, 100)",
+    ["Mochiy Pop One", "sans-serif"],
+    "#33bb88",
     () => {
       router.stageScene("take!");
     },
