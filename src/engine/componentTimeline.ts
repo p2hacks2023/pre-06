@@ -58,10 +58,12 @@ export function InitializeComponents(
       ),
       videoElement,
       (videoElement) => {
-        scratchableImage.setImageData(
-          CropImageFromVideo(videoElement, canvas.width, canvas.height),
+        CropImageFromVideo(videoElement, canvas.width, canvas.height).then(
+          (imageData) => {
+            scratchableImage.setImageData(imageData);
+            router.stageScene("flush");
+          },
         );
-        router.stageScene("flush");
       },
     ),
     ["take!"],

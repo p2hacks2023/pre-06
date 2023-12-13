@@ -12,6 +12,7 @@ async function createSyrupImage(
   canvas.width = baseImage.width;
   canvas.height = baseImage.height;
   const context = canvas.getContext("2d")!;
+
   context.drawImage(baseImage, 0, 0, baseImage.width, baseImage.height);
   const baseImageData = context.getImageData(
     0,

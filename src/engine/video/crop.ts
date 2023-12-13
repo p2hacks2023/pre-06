@@ -25,16 +25,23 @@ export function GetCropGeometryFromVideo(
   return new Bound(captureX, captureY, captureWidth, captureHeight);
 }
 
-export function CropImageFromVideo(
+export async function CropImageFromVideo(
   videoElement: HTMLVideoElement,
   width: number,
   height: number,
-): ImageData {
+): Promise<ImageData> {
   const geom = GetCropGeometryFromVideo(videoElement, width, height);
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
-  const context = canvas.getContext("2d");
-  context?.drawImage(videoElement, geom.x, geom.y, geom.width, geom.height);
-  return context?.getImageData(0, 0, geom.width, geom.height) as ImageData;
+  const context = canvas.getContext("2d")!;
+
+  // wait for video to be ready
+  return await new Promise((resolve) => {
+    videoElement.onloadedmetadata = () => {
+      context.drawImage(videoElement, geom.x, geom.y, geom.width, geom.height);
+      resolve(context.getImageData(0, 0, geom.width, geom.height));
+    };
+    videoElement.load();
+  });
 }
