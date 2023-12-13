@@ -32,8 +32,6 @@ pub(crate) fn to_hsv(pixel: &Rgba<u8>) -> Hsv {
     let I_max = cmp::max(cmp::max(pixel[0], pixel[1]), pixel[2]) as f64;
     let I_min = cmp::min(cmp::min(pixel[0], pixel[1]), pixel[2]) as f64;
 
-    println!{"{}, {}", I_max, I_min};
-
     let s = if I_max != 0.0 { ((I_max - I_min) / I_max) * 100f64 } else { 0.0 };
     let v = (I_max / 255f64) * 100f64;
 
