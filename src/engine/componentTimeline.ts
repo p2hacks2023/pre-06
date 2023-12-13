@@ -21,7 +21,7 @@ export function InitializeComponents(
   let componentContainer: ComponentContainer = new ComponentContainer();
 
   let scratchableImageHotPropChanged: (hotProp: number) => void;
-  const scratchableImage = new ScratchableImage(
+  let scratchableImage = new ScratchableImage(
     new Bound(0, 0, canvas.width, canvas.height),
     () => {
       router.stageScene("scratch!");
