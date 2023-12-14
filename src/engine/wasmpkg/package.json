@@ -1,0 +1,17 @@
+{
+  "name": "hot-finder",
+  "collaborators": [
+    "Yourein <rein.you.3.1@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "hot_finder_bg.wasm",
+    "hot_finder.js",
+    "hot_finder.d.ts"
+  ],
+  "module": "hot_finder.js",
+  "types": "hot_finder.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
