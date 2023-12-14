@@ -1,4 +1,5 @@
 import Bound from "../geometry/bound";
+import { Grade } from "../model/grade";
 import { Scene } from "../model/scene";
 import { Component } from "./component";
 
@@ -99,12 +100,14 @@ class Icecup implements Component {
       this.finishClock = 0;
     }
     if (scene == "syruptime") {
+      /*
       this.syrupColor = [0.5, 0.7, 1.0];
       createSyrupImage(this.baseSyrupImage!, this.syrupColor).then(
         (syrupImage) => {
           this.syrupImage = syrupImage;
         },
       );
+      */
       this.syrupClock = 0;
     }
   }
@@ -166,6 +169,15 @@ class Icecup implements Component {
       );
       context.globalAlpha = 1;
     }
+  }
+
+  setGrade(grade: Grade) {
+    this.syrupColor = grade.color;
+    createSyrupImage(this.baseSyrupImage!, this.syrupColor).then(
+      (syrupImage) => {
+        this.syrupImage = syrupImage;
+      },
+    );
   }
 }
 

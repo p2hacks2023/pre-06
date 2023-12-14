@@ -1,10 +1,12 @@
 import GameExecutor from "./engine/executor";
 import ExecuteVideoElement from "./engine/video/exec";
+import init from "./engine/wasmpkg/hot_finder";
 import "./style.css";
 
 // ゲームを開始する
 // 有効なイベントを引数として指定することで、そのイベントをゲームに反映させる
 function startGame(availableEvents: string[] = []) {
+  init();
   const videoElement = document.createElement("video");
   ExecuteVideoElement(
     navigator,

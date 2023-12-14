@@ -1,5 +1,7 @@
 import Bound from "../geometry/bound";
 import Point from "../geometry/point";
+import { dataURLtoImageData } from "../video/crop";
+import { evaluate_hotness, extract_hot_buffer } from "../wasmpkg/hot_finder";
 import { Component } from "./component";
 
 // 画面の大きさに対する、落とす図形の半径の大きさ
@@ -26,7 +28,7 @@ class ScratchableImage implements Component {
   // フラッシュの強さ
   private flushBrightness: number;
   // 落下した図形が増えた時に呼ばれるコールバック
-  private fallCallback: (hotProp: number) => void;
+  private fallCallback: (hotProp: number, hotness: number) => void;
   // 落下する図形のグループ
   private fallgroup: number[];
   // 次に落下する図形のグループのindex
@@ -41,11 +43,13 @@ class ScratchableImage implements Component {
   private scratchRadius: number;
   // satisfied時に画像全体が向かうy座標
   private goalY: number | null;
+  // 全体のアツさ
+  private hotnessScore: number;
 
   constructor(
     bound: Bound,
     flushEndCallback: () => void,
-    fallCallback: (hotProp: number) => void,
+    fallCallback: (hotProp: number, hotness: number) => void,
   ) {
     this.bound = bound;
     this.goalY = null;
@@ -59,33 +63,35 @@ class ScratchableImage implements Component {
     this.hotPixelCount = 0;
     this.initialHotPixelCount = 0;
     this.nextFallgroup = 0;
+    this.hotnessScore = 0;
     this.scratchRadius =
       Math.min(this.bound.width, this.bound.height) *
       SCRATCH_RADIUS_NORMAL_RATIO;
   }
 
-  setImageData(imageData: ImageData) {
-    this.imageData = imageData;
+  async setImageData(imageDataURL: string) {
+    this.hotnessScore = evaluate_hotness(imageDataURL);
+    const hotBuffer = extract_hot_buffer(imageDataURL);
+    this.imageData = await dataURLtoImageData(imageDataURL);
+    const hotPixelData = await dataURLtoImageData(hotBuffer);
+    this.hotPixel = new Array(
+      this.imageData.width * this.imageData.height,
+    ).fill(false);
+    this.hotPixelCount = 0;
+    this.fallgroup = new Array(
+      this.imageData.width * this.imageData.height,
+    ).fill(-1);
+    this.falltime = [];
 
     for (let i = 0; i < this.imageData.width * this.imageData.height; i++) {
-      this.fallgroup.push(-1);
-      const [x, y] = getXY(i, this.imageData.width);
-      this.hotPixel.push(this.isHotPixel(x, y));
-      if (this.hotPixel[i]) {
+      // if is hot
+      if (hotPixelData.data[i * 4 + 3] > 0) {
+        this.hotPixel[i] = true;
         this.hotPixelCount += 1;
       }
     }
-    this.initialHotPixelCount = this.hotPixelCount;
-  }
 
-  isHotPixel(x: number, y: number) {
-    // モック用の判定
-    const index = getIndex(x, y, this.imageData!.width);
-    const data = this.imageData!.data;
-    return (
-      data[index * 4 + 0] < data[index * 4 + 1] * 1.2 ||
-      data[index * 4 + 0] < data[index * 4 + 2] * 1.2
-    );
+    this.initialHotPixelCount = this.hotPixelCount;
   }
 
   draw(context: CanvasRenderingContext2D) {
@@ -188,6 +194,10 @@ class ScratchableImage implements Component {
       return;
     }
 
+    if (!this.hotPixel[index]) {
+      return;
+    }
+
     // 局所的なボロノイ図を作る
     const voronoiPoints = [[startx, starty]];
     let angle = 0.0;
@@ -252,7 +262,7 @@ class ScratchableImage implements Component {
 
     const hotPixelRatio = this.hotPixelCount / this.initialHotPixelCount;
 
-    this.fallCallback(hotPixelRatio);
+    this.fallCallback(hotPixelRatio, this.hotnessScore);
   }
 
   onSceneChanged(_: string, scene: string): void {
