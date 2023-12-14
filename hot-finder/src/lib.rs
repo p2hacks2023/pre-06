@@ -7,10 +7,9 @@ use wasm_bindgen::prelude::*;
 use std::io::Cursor;
 use std::error::Error;
 use hsv::to_hsv;
-use image::DynamicImage;
 use image::io::Reader as ImageReader;
-use image::GenericImageView;
-use img_util::{base64_to_img, is_pixel_hot};
+use image::{GenericImageView, DynamicImage, RgbaImage, ImageOutputFormat};
+use img_util::{base64_to_img, img_to_base64, is_pixel_hot, to_transparent};
 
 fn byte_to_image(bytes: Vec<u8>) -> Result<DynamicImage, Box<dyn Error + Send + Sync + 'static>> {
     Ok(ImageReader::new(Cursor::new(bytes)).with_guessed_format()?.decode()?)
