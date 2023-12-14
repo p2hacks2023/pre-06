@@ -40,7 +40,24 @@ pub fn evaluate_hotness(img: String) -> f64 {
 /// The output of this function is base64 encoded PNG image.
 #[wasm_bindgen]
 pub fn extract_hot_buffer(img: String) -> String {
-    img
+    let res = match byte_to_image(base64_to_img(img.clone())) {
+        Ok(image) => {
+            let mut imgbuf = RgbaImage::new(image.width(), image.height());
+            for (x, y, px) in image.pixels() {
+                let hsvpx = to_hsv(&px);
+                imgbuf.put_pixel(x, y, if is_pixel_hot(&hsvpx) { px } else { to_transparent(&px) });
+            }
+
+            let mut bytes: Vec<u8> = Vec::new();
+            imgbuf.write_to(&mut Cursor::new(&mut bytes), ImageOutputFormat::Png).unwrap();
+            img_to_base64(bytes, true)
+        },
+        Err(_) => {
+            img
+        }
+    };
+
+    res
 }
 
 #[cfg(test)]
