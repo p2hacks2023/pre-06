@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 
 use base64::{Engine as _, engine::general_purpose};
+use image::Rgba;
 use crate::hsv::Hsv;
 
 /// Classify a pixel is hot or not.
@@ -11,6 +12,10 @@ pub(crate) fn is_pixel_hot(pixel: &Hsv) -> bool {
     let is_in_value_range = 10.0 <= pixel.get_value();
 
     is_in_hue_range && is_in_satu_range && is_in_value_range
+}
+
+pub(crate) fn to_transparent(pixel: &Rgba<u8>) -> Rgba<u8> {
+    Rgba::<u8>([pixel[0], pixel[1], pixel[2], 0u8])
 }
 
 /// Convert an image binary (Vec<u8>) to a base64 (String).
