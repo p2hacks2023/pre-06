@@ -90,4 +90,21 @@ mod tests {
         println!{"{}", evaluate_hotness(b64_img)};
         assert_eq!(1+1, 2);
     }
+
+    // Tests hot_extract_* always pass.
+    // These tests can be used to check and debug.
+    // You have to use redirect(>) and vim to edit it because output (b64String) is extremely long.
+
+    #[test]
+    fn hot_extract_yamaokaya() {
+        let mut file = File::open("./test_assets/IMG_4244_resized.png").unwrap();
+        let mut buf: Vec<u8> = Vec::new();
+        file.read_to_end(&mut buf).unwrap();
+
+        let b64_img = img_util::img_to_base64(buf, true);
+        let res = extract_hot_buffer(b64_img);
+        println!{"{}", res};
+
+        assert_eq!(1+1, 2);
+    }
 }
