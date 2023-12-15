@@ -7,9 +7,9 @@ import { Component } from "./component";
 // 画面の大きさに対する、落とす図形の半径の大きさ
 const SCRATCH_RADIUS_NORMAL_RATIO = 0.1;
 // 重力加速度 (2の倍数であると良い)
-const GRAVITY = 4;
+//const GRAVITY = 4;
 // 落下してからの時間がこの値を超えたら図形が白くなる
-const FALL_TIME_WHITE = 20;
+//const FALL_TIME_WHITE = 20;
 
 function getIndex(x: number, y: number, width: number) {
   return y * width + x;
@@ -18,7 +18,7 @@ function getIndex(x: number, y: number, width: number) {
 class ScratchableImage implements Component {
   bound: Bound;
   // もととなる画像
-  private initialImageData: ImageData | null;
+  //private initialImageData: ImageData | null;
 
   private imageData: ImageData | null;
   // フラッシュが終わった時に呼ばれるコールバック
@@ -51,7 +51,7 @@ class ScratchableImage implements Component {
   ) {
     this.bound = bound;
     this.goalY = null;
-    this.initialImageData = null;
+    //this.initialImageData = null;
     this.imageData = null;
     this.flushEndCallback = flushEndCallback;
     this.flushBrightness = 1.0;
@@ -71,7 +71,7 @@ class ScratchableImage implements Component {
   async setImageData(imageDataURL: string) {
     this.hotnessScore = evaluate_hotness(imageDataURL);
     const hotBuffer = extract_hot_buffer(imageDataURL);
-    this.initialImageData = await dataURLtoImageData(imageDataURL);
+    //this.initialImageData = await dataURLtoImageData(imageDataURL);
     this.imageData = await dataURLtoImageData(imageDataURL);
     const hotPixelData = await dataURLtoImageData(hotBuffer);
     this.hotPixel = new Array(
@@ -133,7 +133,7 @@ class ScratchableImage implements Component {
       const height = this.imageData.height;
       const scratchedImageBuffer = this.imageData.data.map((x) => x);
       context.putImageData(
-        new ImageData(scratchedImageBuffer, this.imageData.width, this.imageData.height),
+        new ImageData(scratchedImageBuffer, width, height),
         this.bound.x,
         this.bound.y,
       );
