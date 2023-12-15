@@ -9,6 +9,7 @@ import { CropImageFromVideo } from "./video/crop";
 import Button from "./component/button";
 import { Grade, GradeList } from "./model/grade";
 import Caption from "./component/caption";
+import HotMeter from "./component/hotmeter";
 
 // scratch!シーンを終える条件となる、残りアツピクセル比率のしきい値
 const SCRATCH_FINISH_HOTPROP_THRESHOLD = 0.15;
@@ -117,6 +118,14 @@ export function InitializeComponents(
     "syruptime",
     "result",
   ]);
+
+  const hotMeter = new HotMeter(
+    0,
+    Math.min(canvas.width, canvas.height) * 0.4,
+    0.0,
+    HOT_EFFECT_THRESHOLD,
+  );
+  componentContainer.addComponent(hotMeter, ["take!"]);
 
   // -- Buttons -- //
 
@@ -319,6 +328,8 @@ export function InitializeComponents(
 
   stateHotnessScoreChangedFunc = (hotness) => {
     captionMiddleTake.changeVisible(hotness > HOT_EFFECT_THRESHOLD);
+    console.log(hotness);
+    hotMeter.updatePercentage(hotness);
   };
 
   return componentContainer;
