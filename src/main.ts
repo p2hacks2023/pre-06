@@ -8,12 +8,12 @@ import "./style.css";
 function startGame(availableEvents: string[] = []) {
   init();
   const videoElement = document.createElement("video");
-  console.log(videoElement.videoWidth, videoElement.videoHeight);
   ExecuteVideoElement(
     navigator,
     videoElement,
     (videoElement) => {
       const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
+      console.log(videoElement.videoWidth, videoElement.videoHeight);
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       const gameExecutor = new GameExecutor(canvas, videoElement);
