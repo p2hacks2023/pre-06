@@ -22,11 +22,13 @@ pub fn evaluate_hotness(img: String) -> f64 {
     match byte_to_image(base64_to_img(img)) {
         Ok(image) => {
             let px_cnt = image.width() * image.height();
-            let hotpx_cnt = image.pixels()
-                                .map(|(_, _, px)| to_hsv(&px))
-                                .filter(|x| is_pixel_hot(&x))
-                                .collect::<Vec<_>>()
-                                .len();
+            let mut hotpx_cnt = 0;
+            for (_, _, px) in image.pixels() {
+                let hsvpx = to_hsv(&px);
+                if is_pixel_hot(&hsvpx) {
+                    hotpx_cnt += 1;
+                }
+            }
 
             (hotpx_cnt as f64) / (px_cnt as f64) * 100.0
         }
