@@ -328,7 +328,6 @@ export function InitializeComponents(
 
   stateHotnessScoreChangedFunc = (hotness) => {
     captionMiddleTake.changeVisible(hotness > HOT_EFFECT_THRESHOLD);
-    console.log(hotness);
     hotMeter.updatePercentage(hotness);
   };
 
