@@ -119,9 +119,11 @@ export function InitializeComponents(
     "result",
   ]);
 
+  const hotMeterHeight = canvas.height * 0.4;
   const hotMeter = new HotMeter(
     0,
-    Math.min(canvas.width, canvas.height) * 0.4,
+    (canvas.height - hotMeterHeight) * 0.5,
+    hotMeterHeight,
     0.0,
     HOT_EFFECT_THRESHOLD,
   );
@@ -328,7 +330,6 @@ export function InitializeComponents(
 
   stateHotnessScoreChangedFunc = (hotness) => {
     captionMiddleTake.changeVisible(hotness > HOT_EFFECT_THRESHOLD);
-    console.log(hotness);
     hotMeter.updatePercentage(hotness);
   };
 

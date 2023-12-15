@@ -44,8 +44,6 @@ function blendColor(
   ];
 }
 
-const ratio = 2;
-
 class HotMeter implements Component {
   bound: Bound;
   percentage: number;
@@ -57,6 +55,7 @@ class HotMeter implements Component {
   constructor(
     x: number,
     y: number,
+    height: number,
     percentage: number,
     hotEffectThreshold: number,
   ) {
@@ -69,12 +68,8 @@ class HotMeter implements Component {
     this.hotEffectThreshold = hotEffectThreshold;
     this.frame = 0;
     this.thermometer.onload = () => {
-      this.bound = new Bound(
-        x,
-        y,
-        this.thermometer.width / ratio,
-        this.thermometer.height / ratio,
-      );
+      const aspectRatio = this.thermometer.width / this.thermometer.height;
+      this.bound = new Bound(x, y, height * aspectRatio, height);
     };
   }
 
@@ -93,19 +88,30 @@ class HotMeter implements Component {
         defaultColor,
         Math.sin(this.frame * 0.3) * 0.3 + 0.7,
       );
-      quakeX = Math.sin(this.frame * 5.0) * 0.01 + 1.0;
-      quakeY = Math.random() * 0.01 + 1.0;
+      quakeX = Math.sin(this.frame * 5.0) * 0.05 + 1.0;
+      quakeY = Math.random() * 0.05 + 1.0;
     }
 
+    const memoryMaxHeight = this.bound.height * 0.87;
+    const memoryHeight = memoryMaxHeight * (this.percentage / 100);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.fillRect(
+      this.bound.x * quakeX + this.bound.width * 0.25,
+      this.bound.y * quakeY + this.bound.height * 0.02,
+      this.bound.width * 0.5,
+      memoryMaxHeight,
+    );
     ctx.fillStyle = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
       color[2] * 255
     })`;
-
     ctx.fillRect(
-      this.bound.x + 32 / ratio,
-      this.bound.y + 16 / ratio + ((100 - this.percentage) * 6.4) / ratio,
-      64 / ratio,
-      (this.percentage * 6.4) / ratio + 5,
+      this.bound.x * quakeX + this.bound.width * 0.25,
+      this.bound.y * quakeY +
+        this.bound.height * 0.02 +
+        memoryMaxHeight -
+        memoryHeight,
+      this.bound.width * 0.5,
+      memoryHeight,
     );
     ctx.drawImage(
       this.thermometer,
