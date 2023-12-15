@@ -1,6 +1,20 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* Evaluate the "hotness" of the image.
+* For more details about the "Hotness", see https://github.com/p2hacks2023/pre-06/issues/7
+* @param {string} img
+* @returns {number}
+*/
+export function evaluate_hotness(img: string): number;
+/**
+* Extract "hot" object from the input.
+* The output of this function is base64 encoded PNG image.
+* @param {string} img
+* @returns {string}
+*/
+export function extract_hot_buffer(img: string): string;
+/**
 * Convert an image binary (Vec<u8>) to a base64 (String).
 * You can choose to put an html data header (e.g., "data:image/jpeg;base64") or not.
 * To put an html data header, put 'true' to the second parameter of the function.
@@ -26,40 +40,26 @@ export function base64_to_img(data: string): Uint8Array;
 export function evaluate_hotness_mock(test_value: string): number;
 /**
 * Mock of "extract_hot_buffer()"
-* Output is a static PNG image that has transparent pixels.
+* Output the input as is.
 * @param {string} img
 * @returns {string}
 */
 export function extract_hot_buffer_mock(img: string): string;
-/**
-* Evaluate the "hotness" of the image.
-* For more details about the "Hotness", see https://github.com/p2hacks2023/pre-06/issues/7
-* @param {string} img
-* @returns {number}
-*/
-export function evaluate_hotness(img: string): number;
-/**
-* Extract "hot" object from the input.
-* The output of this function is base64 encoded PNG image.
-* @param {string} img
-* @returns {string}
-*/
-export function extract_hot_buffer(img: string): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly evaluate_hotness: (a: number, b: number) => number;
+  readonly extract_hot_buffer: (a: number, b: number, c: number) => void;
   readonly img_to_base64: (a: number, b: number, c: number, d: number) => void;
   readonly base64_to_img: (a: number, b: number, c: number) => void;
   readonly evaluate_hotness_mock: (a: number, b: number) => number;
   readonly extract_hot_buffer_mock: (a: number, b: number, c: number) => void;
-  readonly evaluate_hotness: (a: number, b: number) => number;
-  readonly extract_hot_buffer: (a: number, b: number, c: number) => void;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
