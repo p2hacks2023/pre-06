@@ -8,6 +8,7 @@ import "./style.css";
 function startGame(availableEvents: string[] = []) {
   init();
   const videoElement = document.createElement("video");
+  console.log(videoElement.videoWidth, videoElement.videoHeight);
   ExecuteVideoElement(
     navigator,
     videoElement,
