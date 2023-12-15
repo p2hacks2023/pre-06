@@ -1,14 +1,23 @@
 import Bound from "../geometry/bound";
-import { GetCropGeometryFromVideo } from "../video/crop";
+import { CropImageFromVideo, GetCropGeometryFromVideo } from "../video/crop";
+import { evaluate_hotness } from "../wasmpkg/hot_finder";
 import { Component } from "./component";
 
 class VideoPreview implements Component {
   bound: Bound;
   private videoElement: HTMLVideoElement;
+  private hotnessCalculatedCallback: (hotProp: number) => void;
+  private frame: number;
 
-  constructor(bound: Bound, videoElement: HTMLVideoElement) {
+  constructor(
+    bound: Bound,
+    videoElement: HTMLVideoElement,
+    hotnessCalculatedCallback: (hotProp: number) => void,
+  ) {
     this.bound = bound;
     this.videoElement = videoElement;
+    this.hotnessCalculatedCallback = hotnessCalculatedCallback;
+    this.frame = 0;
   }
 
   draw(context: CanvasRenderingContext2D) {
@@ -24,6 +33,20 @@ class VideoPreview implements Component {
       geom.width,
       geom.height,
     );
+
+    if (this.frame % 10 == 0) {
+      setTimeout(() => {
+        const imageDataURL = CropImageFromVideo(
+          this.videoElement,
+          this.bound.width,
+          this.bound.height,
+        );
+        const hotness = evaluate_hotness(imageDataURL);
+        this.hotnessCalculatedCallback(hotness);
+      }, 0);
+    }
+
+    this.frame += 1;
   }
 }
 

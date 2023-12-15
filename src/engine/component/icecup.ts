@@ -43,7 +43,7 @@ async function createSyrupImage(
 
 class Icecup implements Component {
   bound: Bound;
-  private goalBound: Bound;
+  private finishBound: Bound;
   private icecupImage: HTMLImageElement | null;
   private syrupImage: ImageBitmap | null;
   private baseSyrupImage: HTMLImageElement | null;
@@ -56,20 +56,12 @@ class Icecup implements Component {
 
   constructor(
     bound: Bound,
-    canvasWidth: number,
-    canvasHeight: number,
+    finishBound: Bound,
     moveFinishedCallback: () => void,
     syrupFinishedCallback: () => void,
   ) {
     this.bound = bound;
-    const goalWidth = Math.min(canvasWidth, canvasHeight) * 0.75;
-    this.goalBound = new Bound(
-      Math.max(canvasWidth / 2 - goalWidth / 2, 0),
-      Math.max(canvasHeight / 2 - this.bound.height / 2, 0),
-      goalWidth,
-      goalWidth,
-    );
-
+    this.finishBound = finishBound;
     this.finishClock = -1;
     this.syrupClock = -1;
     this.syrupOpacity = 0;
@@ -100,14 +92,6 @@ class Icecup implements Component {
       this.finishClock = 0;
     }
     if (scene == "syruptime") {
-      /*
-      this.syrupColor = [0.5, 0.7, 1.0];
-      createSyrupImage(this.baseSyrupImage!, this.syrupColor).then(
-        (syrupImage) => {
-          this.syrupImage = syrupImage;
-        },
-      );
-      */
       this.syrupClock = 0;
     }
   }
@@ -115,8 +99,8 @@ class Icecup implements Component {
   draw(context: CanvasRenderingContext2D) {
     if (this.finishClock >= 0) {
       this.finishClock += 1;
-      this.bound.animateTo(this.goalBound, 0.05);
-      if (Math.abs(this.bound.y - this.goalBound.y) < 1) {
+      this.bound.animateTo(this.finishBound, 0.05);
+      if (Math.abs(this.bound.y - this.finishBound.y) < 1) {
         this.moveFinishedCallback();
       }
     }
