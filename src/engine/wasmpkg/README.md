@@ -49,4 +49,4 @@ fn extract_hot_buffer_mock(img: String) -> String
 ```
 
 - Mock用の関数です
-- 入力画像に関わらず、透過ピクセルを含む、あるstaticなbase64 PNG画像を返します
+- 入力画像をそのまま返却します
