@@ -34,7 +34,7 @@ class VideoPreview implements Component {
       geom.height,
     );
 
-    if (this.frame % 10 == 0) {
+    if (this.frame % 30 == 0) {
       setTimeout(() => {
         const imageDataURL = CropImageFromVideo(
           this.videoElement,
