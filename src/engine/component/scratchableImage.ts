@@ -102,7 +102,15 @@ class ScratchableImage implements Component {
       return;
     }
     if (this.goalY != null) {
+      if (!this.scratchableImageBuffer) {
+        return;
+      }
       this.bound.y = (this.bound.y - this.goalY) * 0.95 + this.goalY;
+      context.putImageData(
+        this.scratchableImageBuffer,
+        this.bound.x,
+        this.bound.y,
+      );
       return;
     }
     if (this.flushBrightness > 0) {
