@@ -19,6 +19,8 @@ class ScratchableImage implements Component {
   bound: Bound;
   // もととなる画像
   private imageData: ImageData | null;
+
+  private scratchableImageBuffer: ImageData | null;
   // フラッシュが終わった時に呼ばれるコールバック
   private flushEndCallback: () => void;
   // フラッシュの強さ
@@ -50,6 +52,7 @@ class ScratchableImage implements Component {
     this.bound = bound;
     this.goalY = null;
     this.imageData = null;
+    this.scratchableImageBuffer = null;
     this.flushEndCallback = flushEndCallback;
     this.flushBrightness = 1.0;
     this.fallCallback = fallCallback;
@@ -69,6 +72,10 @@ class ScratchableImage implements Component {
     this.hotnessScore = evaluate_hotness(imageDataURL);
     const hotBuffer = extract_hot_buffer(imageDataURL);
     this.imageData = await dataURLtoImageData(imageDataURL);
+    this.scratchableImageBuffer = new ImageData(
+      this.imageData.width,
+      this.imageData.height,
+    );
     const hotPixelData = await dataURLtoImageData(hotBuffer);
     this.hotPixel = new Array(
       this.imageData.width * this.imageData.height,
@@ -94,60 +101,12 @@ class ScratchableImage implements Component {
     if (!this.imageData) {
       return;
     }
-
-    // 全てのfalltimeを更新
-    for (let i = 0; i < this.falltime.length; i++) {
-      if (this.falltime[i] < 0) {
-        continue;
-      }
-      this.falltime[i] += 1;
-    }
-
-    const width = this.imageData.width;
-    const height = this.imageData.height;
-    const data = this.imageData.data;
-    const scratchedImageBuffer = data.map((x) => x);
-    let groupFallHeight = new Array(this.nextFallgroup);
-    let whiteProps = new Array(this.nextFallgroup);
-    for (let i = 0; i < this.nextFallgroup; i++) {
-      groupFallHeight[i] = this.falltime[i] * this.falltime[i] * GRAVITY * 0.5;
-      whiteProps[i] = Math.min(1.0, this.falltime[i] / FALL_TIME_WHITE);
-    }
-
-    for (let i = width * height - 1; i >= 0; i--) {
-      const fallgroup = this.fallgroup[i];
-      if (fallgroup > 0) {
-        scratchedImageBuffer[i * 4 + 3] = 0;
-        if (this.falltime[fallgroup] < 0) {
-          continue;
-        }
-        let fallHeight = groupFallHeight[fallgroup];
-        const debrisIndex = i + fallHeight * width;
-        if (debrisIndex >= width * height) {
-          this.falltime[fallgroup] = -1;
-          continue;
-        }
-        for (let j = 0; j < 3; j++) {
-          scratchedImageBuffer[debrisIndex * 4 + j] =
-            data[i * 4 + j] * (1 - whiteProps[fallgroup]) +
-            255 * whiteProps[fallgroup];
-        }
-        scratchedImageBuffer[debrisIndex * 4 + 3] = data[i * 4 + 3];
-      }
-    }
-
-    context.putImageData(
-      new ImageData(scratchedImageBuffer, width, height),
-      this.bound.x,
-      this.bound.y,
-    );
-
     if (this.goalY != null) {
       this.bound.y = (this.bound.y - this.goalY) * 0.95 + this.goalY;
       return;
     }
-
     if (this.flushBrightness > 0) {
+      context.putImageData(this.imageData, this.bound.x, this.bound.y);
       context.fillStyle = `rgba(255, 255, 255, ${this.flushBrightness})`;
       context.fillRect(
         this.bound.x,
@@ -159,6 +118,63 @@ class ScratchableImage implements Component {
       if (this.flushBrightness <= 0) {
         this.flushEndCallback();
       }
+    } else {
+      if (!this.scratchableImageBuffer) {
+        return;
+      }
+
+      // 全てのfalltimeを更新
+      for (let i = 0; i < this.falltime.length; i++) {
+        if (this.falltime[i] < 0) {
+          continue;
+        }
+        this.falltime[i] += 1;
+      }
+
+      const width = this.imageData.width;
+      const height = this.imageData.height;
+      const data = this.imageData.data;
+      let groupFallHeight = new Array(this.nextFallgroup);
+      let whiteProps = new Array(this.nextFallgroup);
+      for (let i = 0; i < this.nextFallgroup; i++) {
+        groupFallHeight[i] =
+          this.falltime[i] * this.falltime[i] * GRAVITY * 0.5;
+        whiteProps[i] = Math.min(1.0, this.falltime[i] / FALL_TIME_WHITE);
+      }
+
+      for (let i = width * height - 1; i >= 0; i--) {
+        const fallgroup = this.fallgroup[i];
+        if (fallgroup < 0) {
+          this.scratchableImageBuffer.data[i * 4 + 0] = data[i * 4 + 0];
+          this.scratchableImageBuffer.data[i * 4 + 1] = data[i * 4 + 1];
+          this.scratchableImageBuffer.data[i * 4 + 2] = data[i * 4 + 2];
+          this.scratchableImageBuffer.data[i * 4 + 3] = 255;
+        } else {
+          this.scratchableImageBuffer.data[i * 4 + 3] = 0;
+          if (this.falltime[fallgroup] < 0) {
+            continue;
+          }
+          let fallHeight = groupFallHeight[fallgroup];
+          const debrisIndex = i + fallHeight * width;
+          if (debrisIndex >= width * height) {
+            this.falltime[fallgroup] = -1;
+            continue;
+          }
+          for (let j = 0; j < 3; j++) {
+            this.scratchableImageBuffer.data[debrisIndex * 4 + j] =
+              data[i * 4 + j] * (1 - whiteProps[fallgroup]) +
+              255 * whiteProps[fallgroup];
+          }
+          this.scratchableImageBuffer.data[debrisIndex * 4 + 3] =
+            data[i * 4 + 3];
+        }
+      }
+
+      context.putImageData(
+        this.scratchableImageBuffer,
+        this.bound.x,
+        this.bound.y,
+      );
     }
   }
 
