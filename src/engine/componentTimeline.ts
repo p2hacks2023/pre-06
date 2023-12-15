@@ -7,6 +7,7 @@ import Bound from "./geometry/bound";
 import GameRouter from "./executor";
 import { CropImageFromVideo } from "./video/crop";
 import Button from "./component/button";
+import { GradeList } from "./model/grade";
 
 // scratch!シーンを終える条件となる、残りアツピクセル比率のしきい値
 const SCRATCH_FINISH_HOTPROP_THRESHOLD = 0.15;
@@ -20,15 +21,19 @@ export function InitializeComponents(
 ) {
   let componentContainer: ComponentContainer = new ComponentContainer();
 
+  // グローバルな状態として、画像全体のアツさを保持する
+  let stateHotnessScore = 0;
+
   let scratchableImageHotPropChanged: (hotProp: number) => void;
   const scratchableImage = new ScratchableImage(
     new Bound(0, 0, canvas.width, canvas.height),
     () => {
       router.stageScene("scratch!");
     },
-    (hotProp) => {
+    (hotProp, hotness) => {
       if (hotProp < SCRATCH_FINISH_HOTPROP_THRESHOLD) {
         router.stageScene("finish");
+        stateHotnessScore = hotness;
       }
       scratchableImageHotPropChanged(hotProp);
     },
@@ -78,6 +83,7 @@ export function InitializeComponents(
     canvas.width,
     canvas.height,
     () => {
+      icecup.setGrade(new GradeList().getGrade(stateHotnessScore));
       router.stageScene("satisfied");
     },
     () => {
