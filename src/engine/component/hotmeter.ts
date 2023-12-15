@@ -57,8 +57,8 @@ class HotMeter implements Component {
     ctx.rect(
       this.bound.x + 32 / ratio,
       this.bound.y + 16 / ratio + ((100 - this.percentage) * 6.4) / ratio,
-      this.bound.x + 64 / ratio,
-      this.bound.x + 640 / ratio - ((100 - this.percentage) * 6.4) / ratio,
+      64 / ratio,
+      (this.percentage * 6.4) / ratio + 5,
     );
     ctx.fill();
     ctx.drawImage(
