@@ -1,6 +1,6 @@
 import Bound from "../geometry/bound";
 import { CropImageFromVideo, GetCropGeometryFromVideo } from "../video/crop";
-import { evaluate_hotness, evaluate_hotness_mock } from "../wasmpkg/hot_finder";
+import { evaluate_hotness_mock } from "../wasmpkg/hot_finder";
 import { Component } from "./component";
 
 class VideoPreview implements Component {
@@ -36,13 +36,14 @@ class VideoPreview implements Component {
 
     if (this.frame % 30 == 0) {
       setTimeout(() => {
-        const imageDataURL = CropImageFromVideo(
+        let imageDataURL = CropImageFromVideo(
           this.videoElement,
           this.bound.width,
           this.bound.height,
         );
         const hotness = evaluate_hotness_mock("50.0");
         this.hotnessCalculatedCallback(hotness);
+        imageDataURL = "";
       }, 0);
     }
 
