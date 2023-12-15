@@ -8,6 +8,12 @@ import "./style.css";
 function startGame(availableEvents: string[] = []) {
   init();
   const videoElement = document.createElement("video");
+
+  // attribute to iOS Safari
+  videoElement.setAttribute("autoplay", "");
+  videoElement.setAttribute("muted", "");
+  videoElement.setAttribute("playsinline", "");
+
   ExecuteVideoElement(
     navigator,
     videoElement,
