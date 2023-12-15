@@ -34,16 +34,18 @@ class VideoPreview implements Component {
       geom.height,
     );
 
-    if (this.frame % 10 == 0) {
-      setTimeout(() => {
-        const imageDataURL = CropImageFromVideo(
-          this.videoElement,
-          this.bound.width,
-          this.bound.height,
-        );
-        const hotness = evaluate_hotness(imageDataURL);
-        this.hotnessCalculatedCallback(hotness);
-      }, 0);
+    if (this.frame % 20 == 0) {
+      const aspectRatio =
+        this.videoElement.videoWidth / this.videoElement.videoHeight;
+      const cropWidth = 12;
+      const cropHeight = cropWidth / aspectRatio;
+      const imageDataURL = CropImageFromVideo(
+        this.videoElement,
+        cropWidth,
+        cropHeight,
+      );
+      const hotness = evaluate_hotness(imageDataURL);
+      this.hotnessCalculatedCallback(hotness);
     }
 
     this.frame += 1;
