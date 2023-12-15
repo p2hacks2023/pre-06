@@ -76,14 +76,13 @@ class Button implements Component {
     ctx.fill();
 
     ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
 
     ctx.font = `${this.textSize}px '${this.fontFamily.join("', '")}'`;
     ctx.fillStyle = "#fff";
     ctx.fillText(
       this.text,
       this.bound.x + this.bound.width / 2,
-      this.bound.y + this.bound.height / 2 + this.textSize / 2 - 7,
+      this.bound.y + this.bound.height / 2,
     );
   }
 
