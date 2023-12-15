@@ -1,28 +1,31 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* Evaluate the "hotness" of the image.
-* For more details about the "Hotness", see https://github.com/p2hacks2023/pre-06/issues/7
-* @param {string} img
-* @returns {number}
-*/
+ * Evaluate the "hotness" of the image.
+ * For more details about the "Hotness", see https://github.com/p2hacks2023/pre-06/issues/7
+ * @param {string} img
+ * @returns {number}
+ */
 export function evaluate_hotness(img: string): number;
 /**
-* Extract "hot" object from the input.
-* The output of this function is base64 encoded PNG image.
-* @param {string} img
-* @returns {string}
-*/
+ * Extract "hot" object from the input.
+ * The output of this function is base64 encoded PNG image.
+ * @param {string} img
+ * @returns {string}
+ */
 export function extract_hot_buffer(img: string): string;
 /**
-* Convert an image binary (Vec<u8>) to a base64 (String).
-* You can choose to put an html data header (e.g., "data:image/jpeg;base64") or not.
-* To put an html data header, put 'true' to the second parameter of the function.
-* @param {Uint8Array} img
-* @param {boolean} put_html_data_header
-* @returns {string}
-*/
-export function img_to_base64(img: Uint8Array, put_html_data_header: boolean): string;
+ * Convert an image binary (Vec<u8>) to a base64 (String).
+ * You can choose to put an html data header (e.g., "data:image/jpeg;base64") or not.
+ * To put an html data header, put 'true' to the second parameter of the function.
+ * @param {Uint8Array} img
+ * @param {boolean} put_html_data_header
+ * @returns {string}
+ */
+export function img_to_base64(
+  img: Uint8Array,
+  put_html_data_header: boolean,
+): string;
 /**
  * Convert a base64 string to an image binary (Vec<u8>).
  * Both base64 that has an html data header and that doesn't are allowed.
@@ -39,11 +42,11 @@ export function base64_to_img(data: string): Uint8Array;
  */
 export function evaluate_hotness_mock(test_value: string): number;
 /**
-* Mock of "extract_hot_buffer()"
-* Output the input as is.
-* @param {string} img
-* @returns {string}
-*/
+ * Mock of "extract_hot_buffer()"
+ * Output the input as is.
+ * @param {string} img
+ * @returns {string}
+ */
 export function extract_hot_buffer_mock(img: string): string;
 
 export type InitInput =
@@ -62,7 +65,12 @@ export interface InitOutput {
   readonly evaluate_hotness_mock: (a: number, b: number) => number;
   readonly extract_hot_buffer_mock: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
-  readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_realloc: (
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+  ) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
 }

@@ -11,7 +11,14 @@ function getUint8Memory0() {
   return cachedUint8Memory0;
 }
 
-const cachedTextEncoder = (typeof TextEncoder !== 'undefined' ? new TextEncoder('utf-8') : { encode: () => { throw Error('TextEncoder not available') } } );
+const cachedTextEncoder =
+  typeof TextEncoder !== "undefined"
+    ? new TextEncoder("utf-8")
+    : {
+        encode: () => {
+          throw Error("TextEncoder not available");
+        },
+      };
 
 const encodeString =
   typeof cachedTextEncoder.encodeInto === "function"
@@ -66,91 +73,108 @@ function passStringToWasm0(arg, malloc, realloc) {
   return ptr;
 }
 /**
-* Evaluate the "hotness" of the image.
-* For more details about the "Hotness", see https://github.com/p2hacks2023/pre-06/issues/7
-* @param {string} img
-* @returns {number}
-*/
+ * Evaluate the "hotness" of the image.
+ * For more details about the "Hotness", see https://github.com/p2hacks2023/pre-06/issues/7
+ * @param {string} img
+ * @returns {number}
+ */
 export function evaluate_hotness(img) {
-    const ptr0 = passStringToWasm0(img, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.evaluate_hotness(ptr0, len0);
-    return ret;
+  const ptr0 = passStringToWasm0(
+    img,
+    wasm.__wbindgen_malloc,
+    wasm.__wbindgen_realloc,
+  );
+  const len0 = WASM_VECTOR_LEN;
+  const ret = wasm.evaluate_hotness(ptr0, len0);
+  return ret;
 }
 
 let cachedInt32Memory0 = null;
 
 function getInt32Memory0() {
-    if (cachedInt32Memory0 === null || cachedInt32Memory0.byteLength === 0) {
-        cachedInt32Memory0 = new Int32Array(wasm.memory.buffer);
-    }
-    return cachedInt32Memory0;
+  if (cachedInt32Memory0 === null || cachedInt32Memory0.byteLength === 0) {
+    cachedInt32Memory0 = new Int32Array(wasm.memory.buffer);
+  }
+  return cachedInt32Memory0;
 }
 
-const cachedTextDecoder = (typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { ignoreBOM: true, fatal: true }) : { decode: () => { throw Error('TextDecoder not available') } } );
+const cachedTextDecoder =
+  typeof TextDecoder !== "undefined"
+    ? new TextDecoder("utf-8", { ignoreBOM: true, fatal: true })
+    : {
+        decode: () => {
+          throw Error("TextDecoder not available");
+        },
+      };
 
-if (typeof TextDecoder !== 'undefined') { cachedTextDecoder.decode(); };
+if (typeof TextDecoder !== "undefined") {
+  cachedTextDecoder.decode();
+}
 
 function getStringFromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
+  ptr = ptr >>> 0;
+  return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 /**
-* Extract "hot" object from the input.
-* The output of this function is base64 encoded PNG image.
-* @param {string} img
-* @returns {string}
-*/
+ * Extract "hot" object from the input.
+ * The output of this function is base64 encoded PNG image.
+ * @param {string} img
+ * @returns {string}
+ */
 export function extract_hot_buffer(img) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        const ptr0 = passStringToWasm0(img, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        wasm.extract_hot_buffer(retptr, ptr0, len0);
-        var r0 = getInt32Memory0()[retptr / 4 + 0];
-        var r1 = getInt32Memory0()[retptr / 4 + 1];
-        deferred2_0 = r0;
-        deferred2_1 = r1;
-        return getStringFromWasm0(r0, r1);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
+  let deferred2_0;
+  let deferred2_1;
+  try {
+    const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+    const ptr0 = passStringToWasm0(
+      img,
+      wasm.__wbindgen_malloc,
+      wasm.__wbindgen_realloc,
+    );
+    const len0 = WASM_VECTOR_LEN;
+    wasm.extract_hot_buffer(retptr, ptr0, len0);
+    var r0 = getInt32Memory0()[retptr / 4 + 0];
+    var r1 = getInt32Memory0()[retptr / 4 + 1];
+    deferred2_0 = r0;
+    deferred2_1 = r1;
+    return getStringFromWasm0(r0, r1);
+  } finally {
+    wasm.__wbindgen_add_to_stack_pointer(16);
+    wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+  }
 }
 
 function passArray8ToWasm0(arg, malloc) {
-    const ptr = malloc(arg.length * 1, 1) >>> 0;
-    getUint8Memory0().set(arg, ptr / 1);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
+  const ptr = malloc(arg.length * 1, 1) >>> 0;
+  getUint8Memory0().set(arg, ptr / 1);
+  WASM_VECTOR_LEN = arg.length;
+  return ptr;
 }
 /**
-* Convert an image binary (Vec<u8>) to a base64 (String).
-* You can choose to put an html data header (e.g., "data:image/jpeg;base64") or not.
-* To put an html data header, put 'true' to the second parameter of the function.
-* @param {Uint8Array} img
-* @param {boolean} put_html_data_header
-* @returns {string}
-*/
+ * Convert an image binary (Vec<u8>) to a base64 (String).
+ * You can choose to put an html data header (e.g., "data:image/jpeg;base64") or not.
+ * To put an html data header, put 'true' to the second parameter of the function.
+ * @param {Uint8Array} img
+ * @param {boolean} put_html_data_header
+ * @returns {string}
+ */
 export function img_to_base64(img, put_html_data_header) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        const ptr0 = passArray8ToWasm0(img, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        wasm.img_to_base64(retptr, ptr0, len0, put_html_data_header);
-        var r0 = getInt32Memory0()[retptr / 4 + 0];
-        var r1 = getInt32Memory0()[retptr / 4 + 1];
-        deferred2_0 = r0;
-        deferred2_1 = r1;
-        return getStringFromWasm0(r0, r1);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
+  let deferred2_0;
+  let deferred2_1;
+  try {
+    const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+    const ptr0 = passArray8ToWasm0(img, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    wasm.img_to_base64(retptr, ptr0, len0, put_html_data_header);
+    var r0 = getInt32Memory0()[retptr / 4 + 0];
+    var r1 = getInt32Memory0()[retptr / 4 + 1];
+    deferred2_0 = r0;
+    deferred2_1 = r1;
+    return getStringFromWasm0(r0, r1);
+  } finally {
+    wasm.__wbindgen_add_to_stack_pointer(16);
+    wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+  }
 }
 
 function getArrayU8FromWasm0(ptr, len) {
@@ -202,28 +226,32 @@ export function evaluate_hotness_mock(test_value) {
 }
 
 /**
-* Mock of "extract_hot_buffer()"
-* Output the input as is.
-* @param {string} img
-* @returns {string}
-*/
+ * Mock of "extract_hot_buffer()"
+ * Output the input as is.
+ * @param {string} img
+ * @returns {string}
+ */
 export function extract_hot_buffer_mock(img) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        const ptr0 = passStringToWasm0(img, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        wasm.extract_hot_buffer_mock(retptr, ptr0, len0);
-        var r0 = getInt32Memory0()[retptr / 4 + 0];
-        var r1 = getInt32Memory0()[retptr / 4 + 1];
-        deferred2_0 = r0;
-        deferred2_1 = r1;
-        return getStringFromWasm0(r0, r1);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
+  let deferred2_0;
+  let deferred2_1;
+  try {
+    const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+    const ptr0 = passStringToWasm0(
+      img,
+      wasm.__wbindgen_malloc,
+      wasm.__wbindgen_realloc,
+    );
+    const len0 = WASM_VECTOR_LEN;
+    wasm.extract_hot_buffer_mock(retptr, ptr0, len0);
+    var r0 = getInt32Memory0()[retptr / 4 + 0];
+    var r1 = getInt32Memory0()[retptr / 4 + 1];
+    deferred2_0 = r0;
+    deferred2_1 = r1;
+    return getStringFromWasm0(r0, r1);
+  } finally {
+    wasm.__wbindgen_add_to_stack_pointer(16);
+    wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+  }
 }
 
 async function __wbg_load(module, imports) {
