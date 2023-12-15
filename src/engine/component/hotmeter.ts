@@ -94,7 +94,7 @@ class HotMeter implements Component {
 
     const memoryMaxHeight = this.bound.height * 0.87;
     const memoryHeight = memoryMaxHeight * (this.percentage / 100);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
     ctx.fillRect(
       this.bound.x * quakeX + this.bound.width * 0.25,
       this.bound.y * quakeY + this.bound.height * 0.02,
