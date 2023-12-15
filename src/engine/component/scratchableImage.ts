@@ -15,10 +15,6 @@ function getIndex(x: number, y: number, width: number) {
   return y * width + x;
 }
 
-function getXY(index: number, width: number) {
-  return [index % width, Math.floor(index / width)];
-}
-
 class ScratchableImage implements Component {
   bound: Bound;
   // もととなる画像
@@ -110,46 +106,32 @@ class ScratchableImage implements Component {
     const width = this.imageData.width;
     const height = this.imageData.height;
     const data = this.imageData.data;
-    const scratchedImageBuffer = new Uint8ClampedArray(width * height * 4);
-    let groupFallHeight = new Array(this.falltime.length).fill(-1);
+    const scratchedImageBuffer = data.map((x) => x);
+    let groupFallHeight = new Array(this.nextFallgroup);
+    let whiteProps = new Array(this.nextFallgroup);
+    for (let i = 0; i < this.nextFallgroup; i++) {
+      groupFallHeight[i] = this.falltime[i] * this.falltime[i] * GRAVITY * 0.5;
+      whiteProps[i] = Math.min(1.0, this.falltime[i] / FALL_TIME_WHITE);
+    }
 
-    for (let i = 0; i < width * height; i++) {
+    for (let i = width * height - 1; i >= 0; i--) {
       const fallgroup = this.fallgroup[i];
-      if (fallgroup < 0 || !this.hotPixel[i]) {
-        if (scratchedImageBuffer[i * 4 + 3] > 0) {
-          continue;
-        }
-        scratchedImageBuffer[i * 4 + 0] = data[i * 4 + 0];
-        scratchedImageBuffer[i * 4 + 1] = data[i * 4 + 1];
-        scratchedImageBuffer[i * 4 + 2] = data[i * 4 + 2];
-        scratchedImageBuffer[i * 4 + 3] = data[i * 4 + 3];
-      } else {
+      if (fallgroup > 0) {
+        scratchedImageBuffer[i * 4 + 3] = 0;
         if (this.falltime[fallgroup] < 0) {
           continue;
         }
-
         let fallHeight = groupFallHeight[fallgroup];
-        if (groupFallHeight[fallgroup] < 0) {
-          const falltime = this.falltime[fallgroup];
-          fallHeight = falltime * falltime * GRAVITY * 0.5;
-          groupFallHeight[fallgroup] = fallHeight;
-        }
-        const [x, y] = getXY(i, width);
-        const dy = y + fallHeight;
-        const debrisIndex = getIndex(x, dy, width);
+        const debrisIndex = i + fallHeight * width;
         if (debrisIndex >= width * height) {
           this.falltime[fallgroup] = -1;
           continue;
         }
-
-        const whiteProp = this.falltime[fallgroup] / FALL_TIME_WHITE;
-
-        scratchedImageBuffer[debrisIndex * 4 + 0] =
-          data[i * 4 + 0] * (1 - whiteProp) + 255 * whiteProp;
-        scratchedImageBuffer[debrisIndex * 4 + 1] =
-          data[i * 4 + 1] * (1 - whiteProp) + 255 * whiteProp;
-        scratchedImageBuffer[debrisIndex * 4 + 2] =
-          data[i * 4 + 2] * (1 - whiteProp) + 255 * whiteProp;
+        for (let j = 0; j < 3; j++) {
+          scratchedImageBuffer[debrisIndex * 4 + j] =
+            data[i * 4 + j] * (1 - whiteProps[fallgroup]) +
+            255 * whiteProps[fallgroup];
+        }
         scratchedImageBuffer[debrisIndex * 4 + 3] = data[i * 4 + 3];
       }
     }
