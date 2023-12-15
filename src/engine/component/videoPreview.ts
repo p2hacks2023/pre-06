@@ -35,15 +35,13 @@ class VideoPreview implements Component {
     );
 
     if (this.frame % 10 == 0) {
-      setTimeout(() => {
-        const imageDataURL = CropImageFromVideo(
-          this.videoElement,
-          this.bound.width,
-          this.bound.height,
-        );
-        const hotness = evaluate_hotness(imageDataURL);
-        this.hotnessCalculatedCallback(hotness);
-      }, 0);
+      const imageDataURL = CropImageFromVideo(
+        this.videoElement,
+        this.bound.width,
+        this.bound.height,
+      );
+      const hotness = evaluate_hotness(imageDataURL);
+      this.hotnessCalculatedCallback(hotness);
     }
 
     this.frame += 1;
