@@ -5,7 +5,7 @@ import { evaluate_hotness, extract_hot_buffer } from "../wasmpkg/hot_finder";
 import { Component } from "./component";
 
 // 画面の大きさに対する、落とす図形の半径の大きさ
-const SCRATCH_RADIUS_NORMAL_RATIO = 0.1;
+const SCRATCH_RADIUS_NORMAL_RATIO = 0.15;
 // 重力加速度 (2の倍数であると良い)
 const GRAVITY = 4;
 // 落下してからの時間がこの値を超えたら図形が白くなる
@@ -224,6 +224,9 @@ class ScratchableImage implements Component {
     while (stack.length > 0) {
       const [x, y] = stack.pop() as [number, number];
       const index = getIndex(x, y, width);
+      if (!this.hotPixel[index]) {
+        continue;
+      }
       if (this.fallgroup[index] >= 0) {
         continue;
       }
@@ -247,19 +250,35 @@ class ScratchableImage implements Component {
       this.hotPixelCount -= 1;
       // 4方向に伝播
       // up
-      if (x - 1 >= 0 && this.fallgroup[x - 1 + y * width] < 0) {
+      const upIndex = getIndex(x - 1, y, width);
+      if (x - 1 >= 0 && this.fallgroup[upIndex] < 0 && this.hotPixel[upIndex]) {
         stack.push([x - 1, y]);
       }
       // down
-      if (x + 1 < width && this.fallgroup[x + 1 + y * width] < 0) {
+      const downIndex = getIndex(x + 1, y, width);
+      if (
+        x + 1 < width &&
+        this.fallgroup[downIndex] < 0 &&
+        this.hotPixel[downIndex]
+      ) {
         stack.push([x + 1, y]);
       }
       // left
-      if (y - 1 >= 0 && this.fallgroup[x + (y - 1) * width] < 0) {
+      const leftIndex = getIndex(x, y - 1, width);
+      if (
+        y - 1 >= 0 &&
+        this.fallgroup[leftIndex] < 0 &&
+        this.hotPixel[leftIndex]
+      ) {
         stack.push([x, y - 1]);
       }
       // right
-      if (y + 1 < height && this.fallgroup[x + (y + 1) * width] < 0) {
+      const rightIndex = getIndex(x, y + 1, width);
+      if (
+        y + 1 < height &&
+        this.fallgroup[rightIndex] < 0 &&
+        this.hotPixel[rightIndex]
+      ) {
         stack.push([x, y + 1]);
       }
     }
