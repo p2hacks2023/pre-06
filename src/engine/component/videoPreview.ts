@@ -1,6 +1,6 @@
 import Bound from "../geometry/bound";
+import { EvaluateHotness } from "../model/eval";
 import { CropImageFromVideo, GetCropGeometryFromVideo } from "../video/crop";
-import { evaluate_hotness } from "../wasmpkg/hot_finder";
 import { Component } from "./component";
 
 class VideoPreview implements Component {
@@ -91,7 +91,7 @@ class VideoPreview implements Component {
         cropWidth,
         cropHeight,
       );
-      const hotness = evaluate_hotness(imageDataURL);
+      const hotness = EvaluateHotness(imageDataURL);
       this.currentHotness = hotness;
       this.hotnessCalculatedCallback(hotness);
     }

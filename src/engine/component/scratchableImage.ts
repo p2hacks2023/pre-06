@@ -1,7 +1,7 @@
 import Bound from "../geometry/bound";
 import Point from "../geometry/point";
+import { EvaluateHotness, ExtractHotBuffer } from "../model/eval";
 import { dataURLtoImageData } from "../video/crop";
-import { evaluate_hotness, extract_hot_buffer } from "../wasmpkg/hot_finder";
 import { Component } from "./component";
 
 // 画面の大きさに対する、落とす図形の半径の大きさ
@@ -76,8 +76,8 @@ class ScratchableImage implements Component {
   }
 
   async setImageData(imageDataURL: string) {
-    this.hotnessScore = evaluate_hotness(imageDataURL);
-    const hotBuffer = extract_hot_buffer(imageDataURL);
+    this.hotnessScore = EvaluateHotness(imageDataURL);
+    const hotBuffer = ExtractHotBuffer(imageDataURL);
     this.imageData = await dataURLtoImageData(imageDataURL);
     this.scratchableImageBuffer = new ImageData(
       this.imageData.width,
