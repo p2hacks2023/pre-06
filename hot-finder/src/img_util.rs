@@ -9,7 +9,7 @@ use crate::hsv::Hsv;
 pub(crate) fn is_pixel_hot(pixel: &Hsv) -> bool {
     let is_in_hue_range = pixel.get_hue() <= 30.0 || 330.0 <= pixel.get_hue();
     let is_in_satu_range = 50.0 <= pixel.get_saturation();
-    let is_in_value_range = 30.0 <= pixel.get_value();
+    let is_in_value_range = 50.0 <= pixel.get_value();
 
     is_in_hue_range && is_in_satu_range && is_in_value_range
 }
