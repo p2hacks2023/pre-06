@@ -13,7 +13,7 @@ const FALL_TIME_WHITE = 20;
 // アツいピクセルを表す色
 const EFFECT_COLOR = [255, 150, 150];
 // アツいピクセルの色が変化する割合
-const EFFECT_COLOR_STRENGTH = 0.3;
+const EFFECT_COLOR_STRENGTH = 0.4;
 
 function getIndex(x: number, y: number, width: number) {
   return y * width + x;
