@@ -1,0 +1,45 @@
+img {
+  width: 100vw;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  background-image: url("/topbg.webp");
+  background-size: contain;
+  margin: 0;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  margin-bottom: 10vh;
+}
+
+.space {
+  flex-grow: 1;
+}
+
+.button {
+  text-align: center;
+  font-family: "Yuji Syuku";
+  border: none;
+  color: #e7e7e7;
+  text-shadow: 3px 3px #1d1d1d;
+  padding: 1em;
+  padding-bottom: 1.3em;
+  margin-top: -3vh;
+}
+
+.main {
+  font-family: "Yuji Syuku";
+  font-size: 12vw;
+}
+
+.sub {
+  font-family: "Yuji Syuku";
+  font-size: 6vw;
+  margin-bottom: 1em;
+}
