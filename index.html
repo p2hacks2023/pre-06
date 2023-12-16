@@ -3,12 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link href="/index.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Mochiy+Pop+One&display=swap"
+      rel="stylesheet"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
   </head>
-  <body>
-    <div id="app">
-      <a href="/game">game:無料でプレイする！</a>
+  <body onclick="location.href='/game'">
+    <div class="space"></div>
+    <div class="title">
+      <img src="/title.webp" alt="この世界は熱過ぎる!!!" /><br />
+      <div class="button">
+        <span class="main">Touch Screen</span><br />
+        <span class="sub">or Keep your world too hot...</span>
+        <div class="bg"></div>
+      </div>
     </div>
+    <div class="space"></div>
   </body>
 </html>
