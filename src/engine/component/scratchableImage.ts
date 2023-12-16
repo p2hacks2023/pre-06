@@ -5,7 +5,7 @@ import { evaluate_hotness, extract_hot_buffer } from "../wasmpkg/hot_finder";
 import { Component } from "./component";
 
 // 画面の大きさに対する、落とす図形の半径の大きさ
-const SCRATCH_RADIUS_NORMAL_RATIO = 0.1;
+const SCRATCH_RADIUS_NORMAL_RATIO = 0.15;
 // 重力加速度 (2の倍数であると良い)
 const GRAVITY = 4;
 // 落下してからの時間がこの値を超えたら図形が白くなる
@@ -15,14 +15,12 @@ function getIndex(x: number, y: number, width: number) {
   return y * width + x;
 }
 
-function getXY(index: number, width: number) {
-  return [index % width, Math.floor(index / width)];
-}
-
 class ScratchableImage implements Component {
   bound: Bound;
   // もととなる画像
   private imageData: ImageData | null;
+
+  private scratchableImageBuffer: ImageData | null;
   // フラッシュが終わった時に呼ばれるコールバック
   private flushEndCallback: () => void;
   // フラッシュの強さ
@@ -54,6 +52,7 @@ class ScratchableImage implements Component {
     this.bound = bound;
     this.goalY = null;
     this.imageData = null;
+    this.scratchableImageBuffer = null;
     this.flushEndCallback = flushEndCallback;
     this.flushBrightness = 1.0;
     this.fallCallback = fallCallback;
@@ -73,6 +72,10 @@ class ScratchableImage implements Component {
     this.hotnessScore = evaluate_hotness(imageDataURL);
     const hotBuffer = extract_hot_buffer(imageDataURL);
     this.imageData = await dataURLtoImageData(imageDataURL);
+    this.scratchableImageBuffer = new ImageData(
+      this.imageData.width,
+      this.imageData.height,
+    );
     const hotPixelData = await dataURLtoImageData(hotBuffer);
     this.hotPixel = new Array(
       this.imageData.width * this.imageData.height,
@@ -98,74 +101,20 @@ class ScratchableImage implements Component {
     if (!this.imageData) {
       return;
     }
-
-    // 全てのfalltimeを更新
-    for (let i = 0; i < this.falltime.length; i++) {
-      if (this.falltime[i] < 0) {
-        continue;
-      }
-      this.falltime[i] += 1;
-    }
-
-    const width = this.imageData.width;
-    const height = this.imageData.height;
-    const data = this.imageData.data;
-    const scratchedImageBuffer = new Uint8ClampedArray(width * height * 4);
-    let groupFallHeight = new Array(this.falltime.length).fill(-1);
-
-    for (let i = 0; i < width * height; i++) {
-      const fallgroup = this.fallgroup[i];
-      if (fallgroup < 0 || !this.hotPixel[i]) {
-        if (scratchedImageBuffer[i * 4 + 3] > 0) {
-          continue;
-        }
-        scratchedImageBuffer[i * 4 + 0] = data[i * 4 + 0];
-        scratchedImageBuffer[i * 4 + 1] = data[i * 4 + 1];
-        scratchedImageBuffer[i * 4 + 2] = data[i * 4 + 2];
-        scratchedImageBuffer[i * 4 + 3] = data[i * 4 + 3];
-      } else {
-        if (this.falltime[fallgroup] < 0) {
-          continue;
-        }
-
-        let fallHeight = groupFallHeight[fallgroup];
-        if (groupFallHeight[fallgroup] < 0) {
-          const falltime = this.falltime[fallgroup];
-          fallHeight = falltime * falltime * GRAVITY * 0.5;
-          groupFallHeight[fallgroup] = fallHeight;
-        }
-        const [x, y] = getXY(i, width);
-        const dy = y + fallHeight;
-        const debrisIndex = getIndex(x, dy, width);
-        if (debrisIndex >= width * height) {
-          this.falltime[fallgroup] = -1;
-          continue;
-        }
-
-        const whiteProp = this.falltime[fallgroup] / FALL_TIME_WHITE;
-
-        scratchedImageBuffer[debrisIndex * 4 + 0] =
-          data[i * 4 + 0] * (1 - whiteProp) + 255 * whiteProp;
-        scratchedImageBuffer[debrisIndex * 4 + 1] =
-          data[i * 4 + 1] * (1 - whiteProp) + 255 * whiteProp;
-        scratchedImageBuffer[debrisIndex * 4 + 2] =
-          data[i * 4 + 2] * (1 - whiteProp) + 255 * whiteProp;
-        scratchedImageBuffer[debrisIndex * 4 + 3] = data[i * 4 + 3];
-      }
-    }
-
-    context.putImageData(
-      new ImageData(scratchedImageBuffer, width, height),
-      this.bound.x,
-      this.bound.y,
-    );
-
     if (this.goalY != null) {
+      if (!this.scratchableImageBuffer) {
+        return;
+      }
       this.bound.y = (this.bound.y - this.goalY) * 0.95 + this.goalY;
+      context.putImageData(
+        this.scratchableImageBuffer,
+        this.bound.x,
+        this.bound.y,
+      );
       return;
     }
-
     if (this.flushBrightness > 0) {
+      context.putImageData(this.imageData, this.bound.x, this.bound.y);
       context.fillStyle = `rgba(255, 255, 255, ${this.flushBrightness})`;
       context.fillRect(
         this.bound.x,
@@ -177,6 +126,63 @@ class ScratchableImage implements Component {
       if (this.flushBrightness <= 0) {
         this.flushEndCallback();
       }
+    } else {
+      if (!this.scratchableImageBuffer) {
+        return;
+      }
+
+      // 全てのfalltimeを更新
+      for (let i = 0; i < this.falltime.length; i++) {
+        if (this.falltime[i] < 0) {
+          continue;
+        }
+        this.falltime[i] += 1;
+      }
+
+      const width = this.imageData.width;
+      const height = this.imageData.height;
+      const data = this.imageData.data;
+      let groupFallHeight = new Array(this.nextFallgroup);
+      let whiteProps = new Array(this.nextFallgroup);
+      for (let i = 0; i < this.nextFallgroup; i++) {
+        groupFallHeight[i] =
+          this.falltime[i] * this.falltime[i] * GRAVITY * 0.5;
+        whiteProps[i] = Math.min(1.0, this.falltime[i] / FALL_TIME_WHITE);
+      }
+
+      for (let i = width * height - 1; i >= 0; i--) {
+        const fallgroup = this.fallgroup[i];
+        if (fallgroup < 0) {
+          this.scratchableImageBuffer.data[i * 4 + 0] = data[i * 4 + 0];
+          this.scratchableImageBuffer.data[i * 4 + 1] = data[i * 4 + 1];
+          this.scratchableImageBuffer.data[i * 4 + 2] = data[i * 4 + 2];
+          this.scratchableImageBuffer.data[i * 4 + 3] = 255;
+        } else {
+          this.scratchableImageBuffer.data[i * 4 + 3] = 0;
+          if (this.falltime[fallgroup] < 0) {
+            continue;
+          }
+          let fallHeight = groupFallHeight[fallgroup];
+          const debrisIndex = i + fallHeight * width;
+          if (debrisIndex >= width * height) {
+            this.falltime[fallgroup] = -1;
+            continue;
+          }
+          for (let j = 0; j < 3; j++) {
+            this.scratchableImageBuffer.data[debrisIndex * 4 + j] =
+              data[i * 4 + j] * (1 - whiteProps[fallgroup]) +
+              255 * whiteProps[fallgroup];
+          }
+          this.scratchableImageBuffer.data[debrisIndex * 4 + 3] =
+            data[i * 4 + 3];
+        }
+      }
+
+      context.putImageData(
+        this.scratchableImageBuffer,
+        this.bound.x,
+        this.bound.y,
+      );
     }
   }
 
@@ -218,6 +224,9 @@ class ScratchableImage implements Component {
     while (stack.length > 0) {
       const [x, y] = stack.pop() as [number, number];
       const index = getIndex(x, y, width);
+      if (!this.hotPixel[index]) {
+        continue;
+      }
       if (this.fallgroup[index] >= 0) {
         continue;
       }
@@ -241,19 +250,35 @@ class ScratchableImage implements Component {
       this.hotPixelCount -= 1;
       // 4方向に伝播
       // up
-      if (x - 1 >= 0 && this.fallgroup[x - 1 + y * width] < 0) {
+      const upIndex = getIndex(x - 1, y, width);
+      if (x - 1 >= 0 && this.fallgroup[upIndex] < 0 && this.hotPixel[upIndex]) {
         stack.push([x - 1, y]);
       }
       // down
-      if (x + 1 < width && this.fallgroup[x + 1 + y * width] < 0) {
+      const downIndex = getIndex(x + 1, y, width);
+      if (
+        x + 1 < width &&
+        this.fallgroup[downIndex] < 0 &&
+        this.hotPixel[downIndex]
+      ) {
         stack.push([x + 1, y]);
       }
       // left
-      if (y - 1 >= 0 && this.fallgroup[x + (y - 1) * width] < 0) {
+      const leftIndex = getIndex(x, y - 1, width);
+      if (
+        y - 1 >= 0 &&
+        this.fallgroup[leftIndex] < 0 &&
+        this.hotPixel[leftIndex]
+      ) {
         stack.push([x, y - 1]);
       }
       // right
-      if (y + 1 < height && this.fallgroup[x + (y + 1) * width] < 0) {
+      const rightIndex = getIndex(x, y + 1, width);
+      if (
+        y + 1 < height &&
+        this.fallgroup[rightIndex] < 0 &&
+        this.hotPixel[rightIndex]
+      ) {
         stack.push([x, y + 1]);
       }
     }
