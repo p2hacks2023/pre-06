@@ -44,6 +44,7 @@ fn evaluate_hotness_mock(test_value: String) -> f64
   - すなわち、wasmの繋ぎこみがテストできます
   - 不正な入力 (負の実数、100より大きな値、数値としてparseできない文字列) が与えられた場合は0を返します
 
+
 ```rust
 fn extract_hot_buffer_mock(img: String) -> String
 ```
