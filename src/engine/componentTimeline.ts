@@ -246,7 +246,12 @@ export function InitializeComponents(
   const coolCaptionStrokeWidth = Math.min(canvas.width, canvas.height) * 0.01;
 
   const captionUpCool = new Caption(
-    new Bound(0.0, canvas.height * 0.1, canvas.width, hotCaptionFontSize),
+    new Bound(
+      0.0,
+      canvas.height * 0.05,
+      canvas.width,
+      hotCaptionFontSize * 4.0,
+    ),
     null,
     0.008,
     `かくして世界は\n\nひんやりを取り戻した`,

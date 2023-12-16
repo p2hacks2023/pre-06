@@ -2,7 +2,7 @@ import Bound from "../geometry/bound";
 import { Component } from "./component";
 
 const BACKGROUND_COLOR_1 = [255, 255, 255];
-const BACKGROUND_COLOR_2 = [110, 200, 255];
+const BACKGROUND_COLOR_2 = [160, 240, 255];
 
 class HeavenBackgroundImage implements Component {
   bound: Bound;
