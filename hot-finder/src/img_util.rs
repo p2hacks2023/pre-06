@@ -7,9 +7,9 @@ use crate::hsv::Hsv;
 /// Classify a pixel is hot or not.
 /// Details: https://github.com/p2hacks2023/pre-06/issues/7
 pub(crate) fn is_pixel_hot(pixel: &Hsv) -> bool {
-    let is_in_hue_range = pixel.get_hue() < 60.0 || 300.0 <= pixel.get_hue();
+    let is_in_hue_range = pixel.get_hue() < 43.0 || 330.0 <= pixel.get_hue();
     let is_in_satu_range = 50.0 <= pixel.get_saturation();
-    let is_in_value_range = 10.0 <= pixel.get_value();
+    let is_in_value_range = 35.0 <= pixel.get_value();
 
     is_in_hue_range && is_in_satu_range && is_in_value_range
 }

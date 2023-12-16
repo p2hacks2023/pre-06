@@ -24,19 +24,19 @@ export function extract_hot_buffer(img: string): string;
 */
 export function img_to_base64(img: Uint8Array, put_html_data_header: boolean): string;
 /**
- * Convert a base64 string to an image binary (Vec<u8>).
- * Both base64 that has an html data header and that doesn't are allowed.
- * @param {string} data
- * @returns {Uint8Array}
- */
+* Convert a base64 string to an image binary (Vec<u8>).
+* Both base64 that has an html data header and that doesn't are allowed.
+* @param {string} data
+* @returns {Uint8Array}
+*/
 export function base64_to_img(data: string): Uint8Array;
 /**
- * Mock of "evaluate_hotness()"
- * Output is test_value. In other words, you can decide the exact return value for your debugging.
- * For negative input, bigger input than 100.0, and other input that couldn't be parsed to f64, this function returns 0.0
- * @param {string} test_value
- * @returns {number}
- */
+* Mock of "evaluate_hotness()"
+* Output is test_value. In other words, you can decide the exact return value for your debugging.
+* For negative input, bigger input than 100.0, and other input that couldn't be parsed to f64, this function returns 0.0
+* @param {string} test_value
+* @returns {number}
+*/
 export function evaluate_hotness_mock(test_value: string): number;
 /**
 * Mock of "extract_hot_buffer()"
@@ -46,12 +46,7 @@ export function evaluate_hotness_mock(test_value: string): number;
 */
 export function extract_hot_buffer_mock(img: string): string;
 
-export type InitInput =
-  | RequestInfo
-  | URL
-  | Response
-  | BufferSource
-  | WebAssembly.Module;
+export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
@@ -69,23 +64,21 @@ export interface InitOutput {
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
 /**
- * Instantiates the given `module`, which can either be bytes or
- * a precompiled `WebAssembly.Module`.
- *
- * @param {SyncInitInput} module
- *
- * @returns {InitOutput}
- */
+* Instantiates the given `module`, which can either be bytes or
+* a precompiled `WebAssembly.Module`.
+*
+* @param {SyncInitInput} module
+*
+* @returns {InitOutput}
+*/
 export function initSync(module: SyncInitInput): InitOutput;
 
 /**
- * If `module_or_path` is {RequestInfo} or {URL}, makes a request and
- * for everything else, calls `WebAssembly.instantiate` directly.
- *
- * @param {InitInput | Promise<InitInput>} module_or_path
- *
- * @returns {Promise<InitOutput>}
- */
-export default function __wbg_init(
-  module_or_path?: InitInput | Promise<InitInput>,
-): Promise<InitOutput>;
+* If `module_or_path` is {RequestInfo} or {URL}, makes a request and
+* for everything else, calls `WebAssembly.instantiate` directly.
+*
+* @param {InitInput | Promise<InitInput>} module_or_path
+*
+* @returns {Promise<InitOutput>}
+*/
+export default function __wbg_init (module_or_path?: InitInput | Promise<InitInput>): Promise<InitOutput>;
