@@ -1,12 +1,5 @@
 img {
-  margin-top: em;
-  position: absolute;
   width: 100vw;
-
-  top: 25%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: none;
 }
 
 body {
@@ -14,23 +7,39 @@ body {
   height: 100vh;
   background-image: url("/topbg.webp");
   background-size: contain;
+  margin: 0;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  margin-bottom: 10vh;
+}
+
+.space {
+  flex-grow: 1;
 }
 
 .button {
-  display: block;
-  background-color: #2f7cca;
-  padding: 0.5em;
-  height: 3em;
-  width: 10em;
-  border-radius: 10px;
-  font-size: 2em;
-  color: white;
-  margin: auto;
-  margin-top: 15em;
+  text-align: center;
   font-family: "Yuji Syuku";
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   border: none;
+  color: #e7e7e7;
+  text-shadow: 3px 3px #1d1d1d;
+  padding: 1em;
+  padding-bottom: 1.3em;
+  margin-top: -3vh;
+}
+
+.main {
+  font-family: "Yuji Syuku";
+  font-size: 12vw;
+}
+
+.sub {
+  font-family: "Yuji Syuku";
+  font-size: 6vw;
+  margin-bottom: 1em;
 }

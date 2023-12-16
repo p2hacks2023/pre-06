@@ -13,10 +13,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
   </head>
-  <body>
-    <img src="/title.webp" /><br />
-    <button class="button" onclick="location.href='/game'">
-      Press to Play
-    </button>
+  <body onclick="location.href='/game'">
+    <div class="space"></div>
+    <div class="title">
+      <img src="/title.webp" alt="この世界は熱過ぎる!!!" /><br />
+      <div class="button">
+        <span class="main">Touch Screen</span><br />
+        <span class="sub">or Keep your world too hot...</span>
+        <div class="bg"></div>
+      </div>
+    </div>
+    <div class="space"></div>
   </body>
 </html>
