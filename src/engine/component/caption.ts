@@ -159,7 +159,7 @@ class Caption implements Component {
           this.bound.width,
           this.bound.height,
           this.frame,
-          3,
+          this.textSize * 0.12,
         );
         break;
       case "toohot":
