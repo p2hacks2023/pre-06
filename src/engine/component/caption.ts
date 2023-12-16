@@ -13,6 +13,96 @@ function blendColor(
   ];
 }
 
+class Particle {
+  x: number;
+  y: number;
+  rangeX: number;
+  rangeY: number;
+  rangeWidth: number;
+  rangeHeight: number;
+  radius: number;
+  initialFrame: number;
+  radiusMax: number;
+  speed: number;
+  startFrame: number;
+
+  constructor(
+    rangeX: number,
+    rangeY: number,
+    rangeWidth: number,
+    rangeHeight: number,
+    initialFrame: number,
+    radiusMax: number,
+  ) {
+    this.x = Math.random() * rangeWidth + rangeX;
+    this.y = Math.random() * rangeHeight + rangeY;
+    this.rangeX = rangeX;
+    this.rangeY = rangeY;
+    this.rangeWidth = rangeWidth;
+    this.rangeHeight = rangeHeight;
+    this.startFrame = initialFrame;
+    this.initialFrame = initialFrame;
+    this.speed = Math.random() * 0.02 + 0.02;
+    this.radius = Math.random() * radiusMax;
+    this.radiusMax = radiusMax;
+  }
+
+  draw(ctx: CanvasRenderingContext2D, frame: number) {
+    if (this.initialFrame > frame) {
+      return;
+    }
+
+    const ratio = (frame - this.startFrame) * this.speed;
+    const size = Math.sin(ratio * Math.PI) * this.radius;
+
+    if (size < 0) {
+      this.x = Math.random() * this.rangeWidth + this.rangeX;
+      this.y = Math.random() * this.rangeHeight + this.rangeY;
+      this.startFrame = frame;
+      this.radius = Math.random() * this.radiusMax;
+      return;
+    }
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+class Particles {
+  particles: Particle[];
+
+  constructor(
+    num: number,
+    rangeX: number,
+    rangeY: number,
+    rangeWidth: number,
+    rangeHeight: number,
+    initialFrame: number,
+    radiusMax: number,
+  ) {
+    this.particles = [];
+    for (let i = 0; i < num; i++) {
+      this.particles.push(
+        new Particle(
+          rangeX,
+          rangeY,
+          rangeWidth,
+          rangeHeight,
+          initialFrame,
+          radiusMax,
+        ),
+      );
+    }
+  }
+
+  draw(ctx: CanvasRenderingContext2D, frame: number) {
+    this.particles.forEach((p) => {
+      p.draw(ctx, frame);
+    });
+  }
+}
+
 class Caption implements Component {
   bound: Bound;
   goalBound: Bound | null;
@@ -26,6 +116,7 @@ class Caption implements Component {
   strokeColor: [number, number, number];
   opacity: number;
   effect: "normal" | "heaven" | "toohot";
+  particles: Particles | null;
   frame: number;
 
   constructor(
@@ -57,12 +148,23 @@ class Caption implements Component {
     switch (this.effect) {
       case "normal":
         this.opacity = 1.0;
+        this.particles = null;
         break;
       case "heaven":
         this.opacity = 0.0;
+        this.particles = new Particles(
+          10,
+          this.bound.x,
+          this.bound.y + textSize,
+          this.bound.width,
+          this.bound.height,
+          this.frame,
+          this.textSize * 0.12,
+        );
         break;
       case "toohot":
         this.opacity = 1.0;
+        this.particles = null;
         break;
     }
   }
@@ -113,6 +215,9 @@ class Caption implements Component {
       ctx.globalAlpha = 1.0;
       this.opacity = (this.opacity - 1.0) * (1.0 - this.animationSpeed) + 1.0;
     });
+    if (this.particles != null) {
+      this.particles.draw(ctx, this.frame);
+    }
     this.frame++;
   }
 

@@ -10,6 +10,10 @@ const SCRATCH_RADIUS_NORMAL_RATIO = 0.15;
 const GRAVITY = 4;
 // 落下してからの時間がこの値を超えたら図形が白くなる
 const FALL_TIME_WHITE = 20;
+// アツいピクセルを表す色
+const EFFECT_COLOR = [255, 150, 150];
+// アツいピクセルの色が変化する割合
+const EFFECT_COLOR_STRENGTH = 0.4;
 
 function getIndex(x: number, y: number, width: number) {
   return y * width + x;
@@ -44,6 +48,8 @@ class ScratchableImage implements Component {
   // 全体のアツさ
   private hotnessScore: number;
 
+  private frame: number;
+
   constructor(
     bound: Bound,
     flushEndCallback: () => void,
@@ -66,6 +72,7 @@ class ScratchableImage implements Component {
     this.scratchRadius =
       Math.min(this.bound.width, this.bound.height) *
       SCRATCH_RADIUS_NORMAL_RATIO;
+    this.frame = 0;
   }
 
   async setImageData(imageDataURL: string) {
@@ -150,12 +157,24 @@ class ScratchableImage implements Component {
         whiteProps[i] = Math.min(1.0, this.falltime[i] / FALL_TIME_WHITE);
       }
 
+      const redProp =
+        (Math.sin(this.frame * 0.2) * 0.5 + 0.5) * EFFECT_COLOR_STRENGTH +
+        (1 - EFFECT_COLOR_STRENGTH);
       for (let i = width * height - 1; i >= 0; i--) {
         const fallgroup = this.fallgroup[i];
         if (fallgroup < 0) {
-          this.scratchableImageBuffer.data[i * 4 + 0] = data[i * 4 + 0];
-          this.scratchableImageBuffer.data[i * 4 + 1] = data[i * 4 + 1];
-          this.scratchableImageBuffer.data[i * 4 + 2] = data[i * 4 + 2];
+          if (this.hotPixel[i]) {
+            this.scratchableImageBuffer.data[i * 4 + 0] =
+              data[i * 4 + 0] * redProp + EFFECT_COLOR[0] * (1 - redProp);
+            this.scratchableImageBuffer.data[i * 4 + 1] =
+              data[i * 4 + 1] * redProp + EFFECT_COLOR[1] * (1 - redProp);
+            this.scratchableImageBuffer.data[i * 4 + 2] =
+              data[i * 4 + 2] * redProp + EFFECT_COLOR[2] * (1 - redProp);
+          } else {
+            this.scratchableImageBuffer.data[i * 4 + 0] = data[i * 4 + 0];
+            this.scratchableImageBuffer.data[i * 4 + 1] = data[i * 4 + 1];
+            this.scratchableImageBuffer.data[i * 4 + 2] = data[i * 4 + 2];
+          }
           this.scratchableImageBuffer.data[i * 4 + 3] = 255;
         } else {
           this.scratchableImageBuffer.data[i * 4 + 3] = 0;
@@ -184,6 +203,7 @@ class ScratchableImage implements Component {
         this.bound.y,
       );
     }
+    this.frame += 1;
   }
 
   // 与えたポイントに対してボロノイ図を導き、その図形を落下させる

@@ -10,6 +10,7 @@ import Button from "./component/button";
 import { Grade, GradeList } from "./model/grade";
 import Caption from "./component/caption";
 import HotMeter from "./component/hotmeter";
+import HeavenBackgroundImage from "./component/heavenBackgroundImage";
 
 // scratch!シーンを終える条件となる、残りアツピクセル比率のしきい値
 const SCRATCH_FINISH_HOTPROP_THRESHOLD = 0.15;
@@ -33,6 +34,16 @@ export function InitializeComponents(
   let stateGrade: Grade = new GradeList().getGrade(0);
   let stateGradeDeterminedFunc: (grade: Grade) => void;
   let stateHotPropChangedFunc: (hotProp: number) => void;
+
+  const heavenBackgroundImage = new HeavenBackgroundImage(
+    new Bound(0, 0, canvas.width, canvas.height),
+  );
+  componentContainer.addComponent(heavenBackgroundImage, [
+    "finish",
+    "satisfied",
+    "syruptime",
+    "result",
+  ]);
 
   const scratchableImage = new ScratchableImage(
     new Bound(0, 0, canvas.width, canvas.height),
@@ -62,6 +73,7 @@ export function InitializeComponents(
         stateHotnessScore = hotness;
         stateHotnessScoreChangedFunc(hotness);
       },
+      HOT_EFFECT_THRESHOLD,
     ),
     ["take!"],
   );
@@ -131,6 +143,9 @@ export function InitializeComponents(
 
   // -- Buttons -- //
 
+  const buttonResultFontSize = Math.min(canvas.width, canvas.height) * 0.05;
+  const buttonResultRound = buttonResultFontSize * 0.2;
+
   const satisfiedButtonWidth = Math.min(canvas.width, canvas.height) * 0.4;
   const satisfiedButton = new Button(
     new Bound(
@@ -139,9 +154,9 @@ export function InitializeComponents(
       satisfiedButtonWidth,
       satisfiedButtonWidth * 0.4,
     ),
-    5,
+    buttonResultRound,
     "結果を見る",
-    22,
+    buttonResultFontSize,
     ["Mochiy Pop One", "sans-serif"],
     "#3388dd",
     () => {
@@ -158,9 +173,9 @@ export function InitializeComponents(
       resultButtonWidth,
       resultButtonWidth * 0.4,
     ),
-    5,
+    buttonResultRound,
     "もう一度遊ぶ",
-    20,
+    buttonResultFontSize,
     ["Mochiy Pop One", "sans-serif"],
     "#33bb88",
     () => {
@@ -231,7 +246,12 @@ export function InitializeComponents(
   const coolCaptionStrokeWidth = Math.min(canvas.width, canvas.height) * 0.01;
 
   const captionUpCool = new Caption(
-    new Bound(0.0, canvas.height * 0.1, canvas.width, hotCaptionFontSize),
+    new Bound(
+      0.0,
+      canvas.height * 0.05,
+      canvas.width,
+      hotCaptionFontSize * 4.0,
+    ),
     null,
     0.008,
     `かくして世界は\n\nひんやりを取り戻した`,
