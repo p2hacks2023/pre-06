@@ -1,0 +1,36 @@
+img {
+  margin-top: em;
+  position: absolute;
+  width: 100vw;
+
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: none;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  background-image: url("/topbg.webp");
+  background-size: contain;
+}
+
+.button {
+  display: block;
+  background-color: #2f7cca;
+  padding: 0.5em;
+  height: 3em;
+  width: 10em;
+  border-radius: 10px;
+  font-size: 2em;
+  color: white;
+  margin: auto;
+  margin-top: 15em;
+  font-family: "Yuji Syuku";
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: none;
+}
