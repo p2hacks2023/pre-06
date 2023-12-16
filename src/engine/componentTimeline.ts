@@ -62,6 +62,7 @@ export function InitializeComponents(
         stateHotnessScore = hotness;
         stateHotnessScoreChangedFunc(hotness);
       },
+      HOT_EFFECT_THRESHOLD,
     ),
     ["take!"],
   );
