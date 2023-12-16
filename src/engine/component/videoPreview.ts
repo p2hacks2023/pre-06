@@ -28,7 +28,7 @@ class VideoPreview implements Component {
     this.currentHotness = 0;
     const hotInnerShadowWidth = 1;
     let hotInnerShadow = new ImageData(hotInnerShadowWidth, bound.height);
-    for (let i = 0; i < 5 * bound.height; i++) {
+    for (let i = 0; i < hotInnerShadowWidth * bound.height; i++) {
       const y = Math.floor(i / hotInnerShadowWidth);
       hotInnerShadow.data[i * 4 + 0] = 200;
       hotInnerShadow.data[i * 4 + 1] = 0;

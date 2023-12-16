@@ -157,14 +157,19 @@ class ScratchableImage implements Component {
         whiteProps[i] = Math.min(1.0, this.falltime[i] / FALL_TIME_WHITE);
       }
 
-      const redProp = (Math.sin(this.frame * 0.2)*0.5+0.5) * EFFECT_COLOR_STRENGTH + (1-EFFECT_COLOR_STRENGTH);
+      const redProp =
+        (Math.sin(this.frame * 0.2) * 0.5 + 0.5) * EFFECT_COLOR_STRENGTH +
+        (1 - EFFECT_COLOR_STRENGTH);
       for (let i = width * height - 1; i >= 0; i--) {
         const fallgroup = this.fallgroup[i];
         if (fallgroup < 0) {
           if (this.hotPixel[i]) {
-            this.scratchableImageBuffer.data[i * 4 + 0] = data[i * 4 + 0]*redProp+EFFECT_COLOR[0]*(1-redProp);
-            this.scratchableImageBuffer.data[i * 4 + 1] = data[i * 4 + 1]*redProp+EFFECT_COLOR[1]*(1-redProp);
-            this.scratchableImageBuffer.data[i * 4 + 2] = data[i * 4 + 2]*redProp+EFFECT_COLOR[2]*(1-redProp);
+            this.scratchableImageBuffer.data[i * 4 + 0] =
+              data[i * 4 + 0] * redProp + EFFECT_COLOR[0] * (1 - redProp);
+            this.scratchableImageBuffer.data[i * 4 + 1] =
+              data[i * 4 + 1] * redProp + EFFECT_COLOR[1] * (1 - redProp);
+            this.scratchableImageBuffer.data[i * 4 + 2] =
+              data[i * 4 + 2] * redProp + EFFECT_COLOR[2] * (1 - redProp);
           } else {
             this.scratchableImageBuffer.data[i * 4 + 0] = data[i * 4 + 0];
             this.scratchableImageBuffer.data[i * 4 + 1] = data[i * 4 + 1];
