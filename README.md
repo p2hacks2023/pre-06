@@ -36,14 +36,16 @@
 ## 開発技術 
 
 利用したプログラミング言語  
-- HTML living standard
+- HTML Living standard
 - JavaScript
 - TypeScript
 - Rust
 
-利用したフレームワーク・ライブラリ  
+利用したフレームワーク・ライブラリ
+- [Vite](https://vitejs.dev/)
 - [HTML Canvas](https://html.spec.whatwg.org/multipage/canvas.html#the-canvas-element)
 - [wasm-pack](https://rustwasm.github.io/wasm-pack/)
+- [Prettier](https://prettier.io/)
 
 その他開発に使用したツール・サービス
 - Cloudflare Pages
