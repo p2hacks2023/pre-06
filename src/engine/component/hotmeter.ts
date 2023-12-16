@@ -32,42 +32,101 @@ const thermometer_base = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
   </g>
 </svg>`;
 
-const ratio = 2;
+function blendColor(
+  color1: [number, number, number],
+  color2: [number, number, number],
+  ratio: number,
+): [number, number, number] {
+  return [
+    color1[0] * (1 - ratio) + color2[0] * ratio,
+    color1[1] * (1 - ratio) + color2[1] * ratio,
+    color1[2] * (1 - ratio) + color2[2] * ratio,
+  ];
+}
 
 class HotMeter implements Component {
   bound: Bound;
   percentage: number;
+  goalPercentage: number;
   thermometer: HTMLImageElement;
+  hotEffectThreshold: number;
+  frame: number;
 
-  constructor(x: number, y: number, percentage: number) {
+  constructor(
+    x: number,
+    y: number,
+    height: number,
+    percentage: number,
+    hotEffectThreshold: number,
+  ) {
     this.percentage = percentage;
+    this.goalPercentage = percentage;
+    this.bound = new Bound(x, y, 0, 0);
     this.thermometer = new Image();
     this.thermometer.src =
       "data:image/svg+xml;base64," + btoa(thermometer_base);
-    this.bound = new Bound(
-      x,
-      y,
-      this.thermometer.width / ratio,
-      this.thermometer.height / ratio,
-    );
+    this.hotEffectThreshold = hotEffectThreshold;
+    this.frame = 0;
+    this.thermometer.onload = () => {
+      const aspectRatio = this.thermometer.width / this.thermometer.height;
+      this.bound = new Bound(x, y, height * aspectRatio, height);
+    };
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = "#C32829";
-    ctx.rect(
-      this.bound.x + 32 / ratio,
-      this.bound.y + 16 / ratio + ((100 - this.percentage) * 6.4) / ratio,
-      64 / ratio,
-      (this.percentage * 6.4) / ratio + 5,
+    const defaultColor: [number, number, number] = [
+      195 / 255,
+      40 / 255,
+      41 / 255,
+    ];
+    let color = defaultColor;
+    let quakeX = 1.0,
+      quakeY = 1.0;
+    if (this.percentage > this.hotEffectThreshold) {
+      color = blendColor(
+        [1.0, 1.0, 1.0],
+        defaultColor,
+        Math.sin(this.frame * 0.3) * 0.3 + 0.7,
+      );
+      quakeX = Math.sin(this.frame * 5.0) * 0.05 + 1.0;
+      quakeY = Math.random() * 0.05 + 1.0;
+    }
+
+    const memoryMaxHeight = this.bound.height * 0.87;
+    const memoryHeight = memoryMaxHeight * (this.percentage / 100);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+    ctx.fillRect(
+      this.bound.x * quakeX + this.bound.width * 0.25,
+      this.bound.y * quakeY + this.bound.height * 0.02,
+      this.bound.width * 0.5,
+      memoryMaxHeight,
     );
-    ctx.fill();
+    ctx.fillStyle = `rgb(${color[0] * 255}, ${color[1] * 255}, ${
+      color[2] * 255
+    })`;
+    ctx.fillRect(
+      this.bound.x * quakeX + this.bound.width * 0.25,
+      this.bound.y * quakeY +
+        this.bound.height * 0.02 +
+        memoryMaxHeight -
+        memoryHeight,
+      this.bound.width * 0.5,
+      memoryHeight,
+    );
     ctx.drawImage(
       this.thermometer,
-      this.bound.x,
-      this.bound.y,
+      this.bound.x * quakeX,
+      this.bound.y * quakeY,
       this.bound.width,
       this.bound.height,
     );
+    this.percentage =
+      (this.percentage - this.goalPercentage) * 0.9 + this.goalPercentage;
+    this.frame++;
+  }
+
+  updatePercentage(percentage: number) {
+    this.goalPercentage = percentage;
   }
 }
 
