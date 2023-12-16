@@ -36,7 +36,7 @@
 ## 開発技術 
 
 利用したプログラミング言語  
-- HTML Living standard
+- HTML Living Standard
 - JavaScript
 - TypeScript
 - Rust
