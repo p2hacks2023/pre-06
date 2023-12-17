@@ -1,12 +1,19 @@
 # P2HACKS2023 アピールシート 
 
+<div align="center">
+
+<img alt="この世界は熱過ぎる!!!" src="https://github.com/p2hacks2023/pre-06/assets/69315285/e675a453-36b6-4bd4-a4c8-74801b25377e" width="100%"></img>
+
+</div>
+
 ### プロダクト名
 
 この世界は熱すぎる!!!
 
 ### コンセプト
 
-この世界を、僕らの力でもう少し **ひんやり** とさせてみませんか？
+- 世界に存在する **"""熱い"""** 物体を削ってひんやりさせる
+- アンチひんやりを破壊し世界平和を実現
 
 ### 対象ユーザ
 
@@ -23,7 +30,11 @@
 熱いものを破壊して、世界をひんやりさせる爽快なゲームに仕上がりました。
 熱いものを探す際に、ゲーム画面が、熱いもの探しをアツく盛り上げてくれます。
 
-### スクリーンショット(任意)  
+### スクリーンショット
+
+<img alt="sc1" src="https://github.com/p2hacks2023/pre-06/assets/69315285/82ace60e-df42-42b7-8860-3e5e2f85418c" width="25%"></img>
+<img alt="sc2" src="https://github.com/p2hacks2023/pre-06/assets/69315285/d77446c0-d8a2-4c64-8993-6315ef9ef148" width="25%"></img>
+<img alt="sc3" src="https://github.com/p2hacks2023/pre-06/assets/69315285/23f789bd-8ec4-48b7-bfa9-3862f22c896f" width="25%"></img>
 
 ## 開発体制  
 
