@@ -31,9 +31,9 @@
 
 ### スクリーンショット
 
-<img alt="sc1" src="https://github.com/p2hacks2023/pre-06/assets/69315285/82ace60e-df42-42b7-8860-3e5e2f85418c" width="33%"></img>
-<img alt="sc2" src="https://github.com/p2hacks2023/pre-06/assets/69315285/d77446c0-d8a2-4c64-8993-6315ef9ef148" width="33%"></img>
-<img alt="sc3" src="https://github.com/p2hacks2023/pre-06/assets/69315285/23f789bd-8ec4-48b7-bfa9-3862f22c896f" width="33%"></img>
+<img alt="sc1" src="https://github.com/p2hacks2023/pre-06/assets/69315285/82ace60e-df42-42b7-8860-3e5e2f85418c" width="25%"></img>
+<img alt="sc2" src="https://github.com/p2hacks2023/pre-06/assets/69315285/d77446c0-d8a2-4c64-8993-6315ef9ef148" width="25%"></img>
+<img alt="sc3" src="https://github.com/p2hacks2023/pre-06/assets/69315285/23f789bd-8ec4-48b7-bfa9-3862f22c896f" width="25%"></img>
 
 ## 開発体制  
 
